@@ -1,0 +1,141 @@
+<ReportesScreen>:
+    name:'Reportes_Screen'
+    MDBoxLayout:
+        orientation:'vertical'
+        spacing:15
+        padding:15
+        ScrollView:
+            do_scroll_x: True
+            do_scroll_y: False
+            size_hint_y:None
+            height:'170dp'
+            MDGridLayout:
+                padding:15
+                rows:1
+                spacing:15
+                adaptive_width:True
+                width:self.minimum_width
+                MDCard:
+                    spacing:10
+                    elevation:1
+                    size_hint:None,None
+                    height:'150dp'
+                    width:'350dp'
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        size_hint_x:None
+                        MDIcon:
+                            icon:'finance'
+                            font_size:'80sp'
+                            theme_text_color: "Custom"
+                            text_color: "#089cba"
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        MDBoxLayout:
+                            orientation:'vertical'
+                            spacing:5
+                            size_hint_y:None
+                            height:self.minimum_height
+                            MDLabel:
+                                text:'Ventas este mes'
+                                font_name:'Regular'
+                                font_size:'25sp'
+                                adaptive_height:True
+                            MDLabel:
+                                text:'$20,000'
+                                font_name:'Bold'
+                                font_size:'25sp'
+                                adaptive_height:True
+                            MDLabel:
+                                text:'+ 20% que el mes anterior'
+                                font_name:'Regular'
+                                font_size:'15sp'
+                                adaptive_height:True
+                                theme_text_color: "Custom"
+                                text_color: "#8d8d8d"
+                MDCard:
+                    spacing:10
+                    elevation:1
+                    size_hint:None,None
+                    height:'150dp'
+                    width:'350dp'
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        size_hint_x:None
+                        MDIcon:
+                            icon:'washing-machine'
+                            font_size:'80sp'
+                            theme_text_color: "Custom"
+                            text_color: "#089cba"
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        MDBoxLayout:
+                            orientation:'vertical'
+                            spacing:5
+                            size_hint_y:None
+                            height:self.minimum_height
+                            MDLabel:
+                                text:'Servicios en el mes'
+                                font_name:'Regular'
+                                font_size:'25sp'
+                                adaptive_height:True
+                            MDLabel:
+                                text:'70 servicios'
+                                font_name:'Bold'
+                                font_size:'25sp'
+                                adaptive_height:True
+                            MDLabel:
+                                text:'+ 20% que el mes anterior'
+                                font_name:'Regular'
+                                font_size:'15sp'
+                                adaptive_height:True
+                                theme_text_color: "Custom"
+                                text_color: "#8d8d8d"
+                MDCard:
+                    spacing:10
+                    elevation:1
+                    size_hint:None,None
+                    height:'150dp'
+                    width:'350dp'
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        size_hint_x:None
+                        MDIcon:
+                            icon:'cash-register'
+                            font_size:'80sp'
+                            theme_text_color: "Custom"
+                            text_color: "#089cba"
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        MDBoxLayout:
+                            orientation:'vertical'
+                            spacing:5
+                            size_hint_y:None
+                            height:self.minimum_height
+                            MDLabel:
+                                text:'Ticket promedio'
+                                font_name:'Regular'
+                                font_size:'25sp'
+                                adaptive_height:True
+                            MDLabel:
+                                text:'$250.00'
+                                font_name:'Bold'
+                                font_size:'25sp'
+                                adaptive_height:True
+                            MDLabel:
+                                text:'5% menor que el del mes anterior'
+                                font_name:'Regular'
+                                font_size:'15sp'
+                                adaptive_height:True
+                                theme_text_color: "Custom"
+                                text_color: "#8d8d8d"
+        MDCard:
+            elevation:1
+            padding:10
+            id:graph_ventas

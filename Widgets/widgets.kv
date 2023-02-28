@@ -1,0 +1,92 @@
+<BtnServicio>:
+    elevation:1
+    padding:'3sp'
+    ripple_behavior: True
+    radius:10
+    size_hint:None,None
+    height:120
+    width:120
+    md_bg_color:'#ffffff'
+    orientation:'vertical'
+    on_release:
+        if self.children[0].text=='ROPA PARA LAV / KG':app.root.ids.main_manager.get_screen('Venta_Screen').get_cant()
+        else:app.root.ids.main_manager.get_screen('Venta_Screen').add_service(self.children[0].text)
+    MDLabel:
+        id:srvc
+        font_name:'Regular'
+        halign:'center'
+
+<ActivosCard>:
+    elevation:1
+    size_hint:None,None
+    height:'300dp'
+    width:'200dp'
+    orientation:'vertical'
+    padding:15
+    spacing:10
+    MDLabel:
+        adaptive_height:True
+        font_name:'Bold'
+        font_size:'19sp'
+        text:'Luis Ruben Ramos Cortes'
+        size_hint_y:None
+    MDAnchorLayout:
+        anchor_x:'center'
+        anchor_y:'center'
+        id:content
+        MDBoxLayout:
+            padding:20
+            spacing:20
+            size_hint_y:None
+            orientation:'vertical'
+            height:self.minimum_height
+            MDAnchorLayout:
+                anchor_x:'center'
+                anchor_y:'center'
+                MDIcon:
+                    icon:'clock'
+                    theme_text_color: "Custom"
+                    text_color: "#8d8d8d"
+                    font_size:'28sp'
+                    halign:'center'
+                    adaptive_height:True
+            MDLabel:
+                text:'Nota pendiente de carga'
+                halign:'center'
+                theme_text_color: "Custom"
+                text_color: "#8d8d8d"
+                font_size:'17sp'
+                font_name:'Regular'
+                adaptive_height:True
+    MDBoxLayout:
+        size_hint_y:None
+        spacing:10
+        height:self.minimum_height
+        MDLabel:
+            adaptive_height:True
+            text:'Total:'
+            font_name:'Regular'
+            font_size:'15sp'
+            halign:'right'
+        MDLabel:
+            size_hint_x:.3
+            adaptive_height:True
+            text:'$-.--'
+            font_name:'Regular'
+            font_size:'15sp'
+    MDBoxLayout:
+        size_hint_y:None
+        spacing:10
+        height:self.minimum_height
+        MDLabel:
+            adaptive_height:True
+            text:'Saldo:'
+            font_name:'Regular'
+            font_size:'15sp'
+            halign:'right'
+        MDLabel:
+            size_hint_x:.3
+            adaptive_height:True
+            text:'$-.--'
+            font_name:'Regular'
+            font_size:'15sp'
