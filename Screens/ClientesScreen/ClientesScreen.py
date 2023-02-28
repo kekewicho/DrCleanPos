@@ -3,6 +3,7 @@ import requests
 from kivymd.uix.screen import Screen
 import database as db
 from kivymd.uix.list import OneLineListItem
+from kivy.uix.image import Image
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.snackbar import MDSnackbar
@@ -69,9 +70,11 @@ class ClientesScreen(Screen):
                     md_bg_color='#089cba',
                     pos_hint={'right':.95,'top':.95}))
 
-    def add_address(self):
+    def add_address(self,wdg):
+        for i in self.ids.mapa.children:
+            if isinstance(i,MapMarkerPopup):self.ids.mapa.remove_widget(i)
         self.ids.clientes_manager.current='add_address'
-        self.ids.mapa_layout.remove_widget(self.ids.mapa_layout.children[0])
+        self.ids.mapa_layout.remove_widget(wdg)
 
     def busqueda(self,text):
         if len(text)<3: return None
@@ -189,11 +192,17 @@ class ClientesScreen(Screen):
         print(lat,lng)
         self.ids.mapa.center_on(lat, lng)
         self.ids.mapa.zoom=17
-        self.ids.mapa.add_marker(MapMarkerPopup(lat=lat,lon=lng,source='Assets\images\map_marker.png'))
+        if len(self.ids.mapa_layout.children)<2:self.ids.mapa_layout.add_widget(
+            Image(
+            source="Assets\\images\\map_marker.png",
+            pos_hint={'center_x':.5,'y':0.025}
+            )
+        )
 
 
     def show_sugest(self,data):
         data=self.get_ubi(data)
+        self.ids.datos.clear_widgets()
         for i in data:
             id_value = i[1]  # Guarda el valor de 'data' en una variable
             self.ids.datos.add_widget(OneLineListItem(

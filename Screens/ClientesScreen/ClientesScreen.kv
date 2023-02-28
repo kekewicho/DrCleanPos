@@ -18,7 +18,7 @@
             text:'Agregar domicilio'
             md_bg_color:'#089cba'
             pos_hint:{'right':.95,'top':.95}
-            on_release:app.root.ids.main_manager.get_screen('Clientes_Screen').ids.clientes_manager.current='add_address'
+            on_release:app.root.ids.main_manager.get_screen('Clientes_Screen').add_address(root)
     MDFloatLayout:
 
 <Botones>:
@@ -177,6 +177,17 @@
                     ScrollView:
                         MDList:
                             id:datos
+                    MDBoxLayout:
+                        spacing:10
+                        MDRaisedButton:
+                            size_hint_x:1
+                            text:'Cancelar'
+                            md_bg_color: "#990000"
+                            on_release:clientes_manager.current="detalles_cliente"
+                        MDRaisedButton:
+                            size_hint_x:1
+                            text:'Guardar'
+                            md_bg_color: "#089cba"
         MDCard:
             elevation:1
             RelativeLayout:
