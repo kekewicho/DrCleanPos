@@ -1,0 +1,5 @@
+#API KEYS
+*.env
+
+#Ignorar la cache generada por la app
+cache
