@@ -1,13 +1,16 @@
-from kivymd.uix.button import MDIconButton
-from kivymd.uix.pickers import MDDatePicker
-from kivymd.uix.screen import Screen
-from kivymd.uix.datatables import MDDataTable
-from datetime import datetime,date
-from database import bd
-from kivy.metrics import dp
-from kivy.clock import mainthread
-import pandas as pd
-from threading import Thread
+from utils import (
+    MDIconButton,
+    MDDatePicker,
+    Screen,
+    MDDataTable,
+    date,
+    datetime,
+    bd,
+    dp,
+    mainthread,
+    pd,
+    Thread
+)
 
 class BotonesNotas(MDIconButton):
     pass
@@ -49,7 +52,8 @@ class NotasScreen(Screen):
 
     def load_data(self):
         data=bd.child('notas').get()
-        self.notas=pd.DataFrame(data.val()).transpose()
+        self.notas=pd.DataFrame(data.val(),index=None).transpose()
+        self.notas=self.notas.reset_index(drop=False)
         self.notas['subtotal']=self.notas['articulos'].apply(self.get_sub)
         self.notas['total']=self.notas['subtotal']+self.notas['envio']-self.notas['descuentos']
         self.notas['saldo']=self.notas['total']-self.notas['abonos']
@@ -61,6 +65,7 @@ class NotasScreen(Screen):
         data_ventas.sort_values(by='fecha',inplace=True,ascending=False)
         row_data = self.df_to_datatable(data_ventas)
         self.create_dataTable(row_data)
+        print(self.notas.columns)
 
 
     #Codigo y funciones del funcionamiento de la pantalla de Notas
@@ -115,23 +120,20 @@ class NotasScreen(Screen):
         scr.manager.parent.children[-1].ids.box_items.children[-1].active=True
         scr.manager.parent.children[-1].ids.box_items.children[-2].active=False
         
-    def search(self,value,fecha_inicio,fecha_final):
-        data=[]
-        fi=datetime.strptime(fecha_inicio, '%Y-%m-%d') if fecha_inicio!='' else datetime.strptime('2000-1-1', '%Y-%m-%d')
-        ff=datetime.strptime(fecha_final, '%Y-%m-%d') if fecha_final!='' else datetime.strptime(str(date.today()), '%Y-%m-%d')
-        notas=bd.child('notas').order_by_child('fecha').start_at(fi).end_at(ff).get()
-        for i in notas.each():
-            fecha=datetime.strptime(i.val()['fecha'],'%Y-%m-%d')
-            if ((i.key()).upper()==value.upper() or value.upper() in (i.val()['usuario_name']).upper() or (i.val()['usuario']).upper()==value.upper()):
-                subtotal=0
-                for j in i.val()['articulos']:
-                    subtotal+=float(j.get('cantidad'))*float(j.get('precio'))
-                total=subtotal+i.val()['envio']-i.val()['descuentos']
-                _saldo=total-i.val()['abonos']
-                saldo=('cash-clock',[248/256,236/256,14/256,1],'${:,.2f}'.format(_saldo)) if _saldo>0 else ('cash-check',[29/256,143/256,12/256,1],'${:,.2f}'.format(_saldo),)
-                domicilio='SI' if (i.val()).get('a domicilio')==True else 'NO'
-                data.append((i.val().get('usuario_name'),(i.val()).get('fecha'),domicilio,'${:,.2f}'.format(total),saldo,i.key()))
-        self.children[0].children[0].row_data=data
+    def search(self,value:str,fecha_inicio:str,fecha_final:str):
+        fi=fecha_inicio if fecha_inicio!='' else '2000-1-1'
+        ff=fecha_final if fecha_final!='' else str(date.today())
+        data_ventas=self.notas[['index','usuario_name','fecha','a domicilio','total','saldo','usuario']]
+        data_ventas['fecha']=pd.to_datetime(data_ventas['fecha'],format='%Y-%m-%d')
+        data_ventas=data_ventas[((data_ventas['index']==value) | (data_ventas['usuario_name'].str.upper().str.contains(value.upper())) | (data_ventas['usuario']==value)) & ((data_ventas['fecha']>=fi) & (data_ventas['fecha']<=ff))]
+        data_ventas.drop('index', axis=1, inplace=True)
+        data_ventas['fecha']=data_ventas['fecha'].dt.date
+        data_ventas['total']=data_ventas['total'].apply(lambda x:'${:,.2f}'.format(x))
+        data_ventas['a domicilio']=data_ventas['a domicilio'].apply(lambda x: 'SI' if x else 'NO')
+        data_ventas['saldo']=data_ventas['saldo'].apply(lambda x:('cash-clock',[248/256,236/256,14/256,1],'${:,.2f}'.format(x)) if x>0 else ('cash-check',[29/256,143/256,12/256,1],'${:,.2f}'.format(x)))
+        data_ventas.sort_values(by='fecha',inplace=True,ascending=False)
+        row_data = self.df_to_datatable(data_ventas)
+        self.dataTable.row_data=row_data
 
     def on_save_ff(self, instance, value, date_range):
         self.ids.ff.text=str(value)

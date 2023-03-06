@@ -1,4 +1,7 @@
-from kivymd.uix.screen import Screen
+from utils import (
+    Screen
+)
+
 from Widgets.widgets import ActivosCard
 
 class ActivosScreen(Screen):

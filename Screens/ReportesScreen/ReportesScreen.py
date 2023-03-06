@@ -1,10 +1,12 @@
-from kivymd.uix.screen import Screen
-from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
-import pandas as pd
-from database import bd
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-from kivy.clock import mainthread
+from utils import (
+    Screen,
+    FigureCanvasKivyAgg,
+    pd,
+    bd,
+    plt,
+    ticker,
+    mainthread
+)
 
 
 class ReportesScreen(Screen):

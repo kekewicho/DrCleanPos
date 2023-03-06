@@ -1,18 +1,20 @@
-import os
-import requests
-from kivymd.uix.screen import Screen
-import database as db
-from kivymd.uix.list import OneLineListItem
-from kivy.uix.image import Image
-from kivymd.uix.textfield import MDTextField
-from kivymd.uix.button import MDRaisedButton
-from kivymd.uix.snackbar import MDSnackbar
-from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.label import MDLabel
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivy.garden.mapview.mapview.view import MapMarkerPopup
-import database
-from kivy.clock import mainthread
+from utils import (
+    os,
+    requests,
+    Screen,
+    bd,
+    OneLineListItem,
+    Image,
+    MDTextField,
+    MDRaisedButton,
+    MDSnackbar,
+    MDLabel,
+    MDBoxLayout,
+    MapMarkerPopup,
+    mainthread,
+    clientes,
+    Thread
+)
 
 api_key=os.getenv("MAPS_API_KEY")
 print(api_key)
@@ -27,12 +29,13 @@ class Botones(MDRaisedButton):
     pass
 
 class ClientesScreen(Screen):
+    layout=LayoutSD()
     #Busqueda consulta inicial de los clientes:
     def get_clientes(self):
-        clientes=database.bd.child('clientes').get()
-        for i in clientes.each():
+        _clientes=bd.child('clientes').get()
+        for i in _clientes.each():
             self.set_clientes(i)
-            database.clientes[i.key()]=i.val()
+            clientes[i.key()]=i.val()
     
     @mainthread
     def set_clientes(self,clientes):
@@ -48,7 +51,7 @@ class ClientesScreen(Screen):
     def select_user(self,user):
         self.ids.clientes_manager.current='detalles_cliente'
         user_id=user
-        user=db.bd.child('clientes/'+user).get()
+        user=bd.child('clientes/'+user).get()
         for i in ('id_user','nombre','apellido','telefono','rfc','domicilio_fiscal','razon_social','regimen_fiscal'):
             try:
                 if i=='id_user':self.ids.id_user.text=user_id
@@ -57,11 +60,7 @@ class ClientesScreen(Screen):
                 print(i)
         domicilio=(user.val()).get('domicilio')
         if domicilio is None or len(domicilio)==0:self.ids.mapa_layout.add_widget(LayoutSD());return None
-        if len(domicilio)==1:
-            self.ids.mapa.center_on(domicilio[0]['lat'], domicilio[0]['lon'])
-            self.ids.mapa.zoom=17
-            self.ids.mapa.add_marker(MapMarkerPopup(lat=domicilio[0]['lat'], lon=domicilio[0]['lon'],source='Assets\images\map_marker.png'))
-        if len(domicilio)>1:
+        else:
             for i in domicilio:
                 self.ids.mapa.zoom=17
                 self.ids.mapa.add_marker(MapMarkerPopup(lat=domicilio[0]['lat'], lon=domicilio[0]['lon'],source='Assets\images\map_marker.png'))
@@ -79,10 +78,10 @@ class ClientesScreen(Screen):
     def busqueda(self,text):
         if len(text)<3: return None
         self.ids.clientes_list.clear_widgets()
-        for i in db.clientes:
-            if str(i)==text or (text.upper() in db.clientes[i]['nombre'].upper()+' '+db.clientes[i]['apellido'].upper()):
+        for i in clientes:
+            if str(i)==text or (text.upper() in clientes[i]['nombre'].upper()+' '+clientes[i]['apellido'].upper()):
                 self.ids.clientes_list.add_widget(OneLineListItem(
-                    text=db.clientes[i]['nombre']+' '+db.clientes[i]['apellido'],
+                    text=clientes[i]['nombre']+' '+clientes[i]['apellido'],
                     on_release=lambda x, key=i: self.select_user(key)
                     )
                 )
@@ -100,9 +99,9 @@ class ClientesScreen(Screen):
     
     def clean_filters(self):
         self.ids.clientes_list.clear_widgets()
-        for i in db.clientes:
+        for i in clientes:
             self.ids.clientes_list.add_widget(OneLineListItem(
-                text=db.clientes[i]['nombre']+' '+db.clientes[i]['apellido'],
+                text=clientes[i]['nombre']+' '+clientes[i]['apellido'],
                 on_release=lambda x, key=i: self.select_user(key)
                 )
             )
@@ -115,14 +114,14 @@ class ClientesScreen(Screen):
             if isinstance(i,MDTextField) and not i.hint_text=='ID de usuario':
                 if len(i.text)>0:data[list(self.ids.keys())[list(self.ids.values()).index(i)]]=i.text
         if len(self.ids.id_user.text)==0:
-            new_user=db.bd.child('clientes').push(data)
+            new_user=bd.child('clientes').push(data)
             userid=new_user['name']
             print(userid)
-            db.clientes[userid]=data
+            clientes[userid]=data
             MDSnackbar(MDLabel(text='Cliente registrado con éxito',theme_text_color="Custom",
                 text_color="#ffffff",)).open()
         else:
-            db.bd.child(f'clientes/{self.ids.id_user.text}').update(data)
+            bd.child(f'clientes/{self.ids.id_user.text}').update(data)
             MDSnackbar(MDLabel(text='Cliente actualizado con éxito',theme_text_color="Custom",
                 text_color="#ffffff",)).open()
         self.clean()
@@ -137,31 +136,21 @@ class ClientesScreen(Screen):
         for i in ('Cancelar','Guardar'):self.ids.buttons_layout.add_widget(Botones(text=i))
 
     def eliminar(self):
-        db.bd.child(f'clientes/{self.ids.id_user.text}').remove()
-        db.clientes.pop(self.ids.id_user.text)
+        bd.child(f'clientes/{self.ids.id_user.text}').remove()
+        clientes.pop(self.ids.id_user.text)
         self.clean()
         MDSnackbar(MDLabel(text='Cliente eliminado con éxito',theme_text_color="Custom",
                 text_color="#ffffff",)).open()
+        self.ids.clientes_manager.current="lista_clientes"
+        self.ids.clientes_list.clear_widgets()
+        Thread(target=self.get_clientes()).start()
     
     def nuevo_usuario(self):
-        if self.menu is None:self.menu = MDDropdownMenu(
-            items=[],
-            position="bottom",
-            width_mult=6,
-            )
         self.ids.clientes_manager.current='detalles_cliente'
-        self.clean()
-        fld=MDTextField(
-            mode='round',
-            icon_left='magnify',
-            hint_text='Buscar domicilio',
-            pos_hint={'x':.05,'top':.95},
-            fill_color_normal=(1,1,1,1),
-            size_hint_x=.7
-            )
-        self.menu.caller=fld
-        fld.bind(on_text_validate=lambda x=fld.text:self.show_sugest(x))
-        self.ids.mapa_layout.add_widget(fld)
+        for i in ('id_user','nombre','apellido','telefono','rfc','domicilio_fiscal','razon_social','regimen_fiscal'):
+            self.ids[i].disabled=False
+            self.ids[i].text=""
+        self.ids.mapa_layout.add_widget(LayoutSD())
 
     def define_ubi(self,id):
         print(id)
@@ -237,3 +226,20 @@ class ClientesScreen(Screen):
                     res.append([prediction['description'],prediction['place_id']])
                 for i in res:print(i)
                 return res
+    
+    def set_state(self,state:str):
+        flds=('id_user','nombre','apellido','telefono','rfc','domicilio_fiscal','razon_social','regimen_fiscal')
+        if state=='nothing':
+            self.ids.clientes_manager.current='lista_clientes'
+        if state=='new':
+            self.ids.clientes_manager.current='detalles_cliente'
+            for i in flds:
+                if i=='id_user':self.ids[i].disabled=True
+                self.ids[i].text=''
+                self.ids[i].disabled=False
+        if state=='edit':
+            pass
+        if state=='view':
+            pass
+        if state=='add_adress':
+            pass

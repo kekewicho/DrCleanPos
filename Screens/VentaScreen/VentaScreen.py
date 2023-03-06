@@ -1,18 +1,24 @@
+from utils import (
+    Screen,
+    mainthread,
+    MDDialog,
+    MDFlatButton,
+    MDIconButton,
+    MDBoxLayout,
+    MDList,
+    MDCardSwipe,
+    MDCard,
+    Animation,
+    MDTextField,
+    MDSnackbar,
+    MDLabel,
+    MDDatePicker,
+    date,
+    bd,
+    lista_precios,
+    clientes
+)
 from Widgets.widgets import BtnServicio
-from kivymd.uix.screen import Screen
-from kivy.clock import mainthread
-from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton,MDIconButton
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.list import MDList
-from kivymd.uix.card import MDCardSwipe,MDCard
-from kivy.animation import Animation
-from kivymd.uix.textfield import MDTextField
-from kivymd.uix.snackbar import MDSnackbar
-from kivymd.uix.label import MDLabel
-from kivymd.uix.pickers import MDDatePicker
-from datetime import date
-import database
 
 #Variables globales
 selected_client=''
@@ -36,11 +42,11 @@ class VentaScreen(Screen):
 
     #Ejecución inicial de la app
     def load_services(self):
-        servicios=database.bd.child('servicios').get()
+        servicios=bd.child('servicios').get()
         for i in servicios.each():
             for j in i.val():
                 self.build_ui(j)
-                database.lista_precios[j]=i.val()[j]
+                lista_precios[j]=i.val()[j]
 
     @mainthread
     def build_ui(self,txt):
@@ -66,7 +72,7 @@ class VentaScreen(Screen):
             if 'Apellido' in i.hint_text:data['apellido']=i.text
             if 'Teléfono' in i.hint_text:data['telefono']=i.text
             if 'Domicilio' in i.hint_text:data['domicilio']=i.text
-        new_user=database.bd.child('clientes').push(data)
+        new_user=bd.child('clientes').push(data)
         userid=new_user['name']
         selected_client=userid
         print(selected_client)
@@ -122,12 +128,12 @@ class VentaScreen(Screen):
         cliente=self.dialog.content_cls.ids.cliente.text
         self.dialog.content_cls.ids.lista_usuarios.clear_widgets()
         lista=MDList()
-        for i in database.clientes:
-            if cliente.upper() in str(database.clientes[i]['nombre']).upper() or cliente.upper() in str(database.clientes[i]['apellido']).upper():
+        for i in clientes:
+            if cliente.upper() in str(clientes[i]['nombre']).upper() or cliente.upper() in str(clientes[i]['apellido']).upper():
                 item=UserItem()
-                item.ids.nombre.text=str(database.clientes[i].get('nombre'))+' '+str(database.clientes[i].get('apellido'))
-                item.ids.domicilio.text='Domicilio: '+str(database.clientes[i].get('domicilio'))
-                item.ids.telefono.text='Teléfono: '+str(database.clientes[i].get('telefono'))
+                item.ids.nombre.text=str(clientes[i].get('nombre'))+' '+str(clientes[i].get('apellido'))
+                item.ids.domicilio.text='Domicilio: '+str(clientes[i].get('domicilio'))
+                item.ids.telefono.text='Teléfono: '+str(clientes[i].get('telefono'))
                 item.ids.userid.text=str(i)
                 lista.add_widget(item)
         self.dialog.content_cls.ids.lista_usuarios.add_widget(lista)
@@ -157,7 +163,7 @@ class VentaScreen(Screen):
             item=ServiceItem()
             item.ids.cantidad.text='{:,.1f}'.format(cant)
             item.ids.servicio.text=service
-            item.ids.precio.text="${:,.2f}".format(database.lista_precios.get(service.replace('/','-')))
+            item.ids.precio.text="${:,.2f}".format(lista_precios.get(service.replace('/','-')))
             self.ids.articulos_nota.add_widget(item,len(self.ids.articulos_nota.children))
             self.update_sub()
             return None
@@ -170,7 +176,7 @@ class VentaScreen(Screen):
         item=ServiceItem()
         item.ids.cantidad.text=str(cant)
         item.ids.servicio.text=service
-        item.ids.precio.text="${:,.2f}".format(database.lista_precios.get(service.replace(' / ','-')))
+        item.ids.precio.text="${:,.2f}".format(lista_precios.get(service.replace(' / ','-')))
         self.ids.articulos_nota.add_widget(item,len(self.ids.articulos_nota.children))
         self.update_sub()
 
@@ -183,9 +189,9 @@ class VentaScreen(Screen):
 
     def user_define(self):
         content=ContentUser()
-        users=database.bd.child('clientes').get()
+        users=bd.child('clientes').get()
         for i in users.each():
-            database.clientes[i.key()]=i.val()
+            clientes[i.key()]=i.val()
         self.dialog = MDDialog(
             title="Selecciona un cliente",
             type='custom',
@@ -266,11 +272,11 @@ class VentaScreen(Screen):
             articulos.append(item)
         data['articulos']=articulos
         if idActual==None:
-            database.bd.child('notas').push(data)
+            bd.child('notas').push(data)
             MDSnackbar(MDLabel(text='Venta realizada con éxito',theme_text_color="Custom",
                 text_color="#ffffff",)).open()
         if idActual!=None:
-            database.bd.child(f'notas/{idActual}').update(data)
+            bd.child(f'notas/{idActual}').update(data)
             MDSnackbar(MDLabel(text='Nota actualizada con éxito',theme_text_color="Custom",
                 text_color="#ffffff",)).open()
 

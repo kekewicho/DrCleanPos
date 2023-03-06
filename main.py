@@ -1,7 +1,7 @@
 #Es necesario usar este backend de Matplotlib para que no se redimensione la
 #app al crear los graficos, ya que al parecer el que usa por defecto altera
 #los DPI de la app
-import matplotlib
+from utils import matplotlib
 matplotlib.use('agg')
 
 #Importando todas las clases de las pantallas
@@ -13,10 +13,12 @@ from Screens.ActivosScreen.ActivosScreen import ActivosScreen
 from Screens.VentaScreen.VentaScreen import VentaScreen
 
 #Demás utilidades para el inicio de la app
-from kivymd.app import MDApp
-from os import listdir
-from kivy.core.text import LabelBase
-from threading import Thread
+from utils import (
+    MDApp,
+    Thread,
+    os,
+    LabelBase
+)
 
 class DrCleanPOS(MDApp):
     def build(self):
@@ -28,6 +30,7 @@ class DrCleanPOS(MDApp):
         Thread(target=self.root.ids.main_manager.get_screen('Clientes_Screen').get_clientes).start()
 
 if __name__=='__main__':
-    for i in listdir('Assets/fonts'):
+    for i in os.listdir('Assets/fonts'):
         LabelBase.register(name=(i.replace('Lato-','')).replace('.ttf',''),fn_regular='Assets\\fonts\\'+i)
     DrCleanPOS().run()
+    

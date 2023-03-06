@@ -81,7 +81,6 @@
                             spacing:10
                             size_hint_y:None
                             height:self.minimum_height
-                            id:buttons_layout
                             MDIconButton:
                                 icon:'arrow-left'
                                 size_hint_x:None
@@ -89,10 +88,17 @@
                                     clientes_manager.current='lista_clientes'
                                     root.clean()
                             MDFloatLayout:
-                            Botones:
-                                text:'Modificar'
-                            Botones:
-                                text:'Eliminar'
+                            MDBoxLayout:
+                                size_hint_x:None
+                                id:buttons_layout
+                                MDIconButton:
+                                    icon:'pencil'
+                                    on_release:root.modificar()
+                                MDIconButton:
+                                    icon:'delete'
+                                    theme_icon_color: "Custom"
+                                    icon_color: "#9b0004"
+                                    on_release:root.eliminar()
                         MDLabel:
                             text:'Datos generales:'
                             adaptive_height:True
