@@ -22,14 +22,6 @@
     MDFloatLayout:
 
 <Botones>:
-    md_bg_color: "#990000" if self.text in ('Cancelar','Eliminar') else '#089cba'
-    size_hint_x:1
-    on_release:
-        if self.text=='Cancelar':app.root.ids.main_manager.get_screen('Clientes_Screen').clean()
-        if self.text=='Modificar':app.root.ids.main_manager.get_screen('Clientes_Screen').modificar()
-        if self.text=='Guardar':app.root.ids.main_manager.get_screen('Clientes_Screen').guardar_cambios()
-        if self.text=='Eliminar':app.root.ids.main_manager.get_screen('Clientes_Screen').eliminar()
-        if self.text=='Nuevo Usuario':app.root.ids.main_manager.get_screen('Clientes_Screen').nuevo_usuario()
 
 <ClientesScreen>:
     name:'Clientes_Screen'
@@ -56,18 +48,14 @@
                             on_text:root.busqueda(self.text)
                             id:fldSearch
                         MDIconButton:
-                            icon:'cancel'
+                            icon:'account-plus'
                             theme_icon_color: "Custom"
-                            icon_color: '#990000'
                             size_hint_x:None
                             width:'25dp'
-                            on_release:root.clean_filters()
+                            on_release:root.set_state('new')
                     ScrollView:
                         MDList:
                             id:clientes_list
-                    Botones:
-                        size_hint_x:1
-                        text:'Nuevo Usuario'
             Screen:
                 name:'detalles_cliente'
                 ScrollView:
@@ -88,17 +76,6 @@
                                     clientes_manager.current='lista_clientes'
                                     root.clean()
                             MDFloatLayout:
-                            MDBoxLayout:
-                                size_hint_x:None
-                                id:buttons_layout
-                                MDIconButton:
-                                    icon:'pencil'
-                                    on_release:root.modificar()
-                                MDIconButton:
-                                    icon:'delete'
-                                    theme_icon_color: "Custom"
-                                    icon_color: "#9b0004"
-                                    on_release:root.eliminar()
                         MDLabel:
                             text:'Datos generales:'
                             adaptive_height:True

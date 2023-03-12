@@ -13,11 +13,12 @@ from utils import (
     MapMarkerPopup,
     mainthread,
     clientes,
-    Thread
+    Thread,
+    MDIconButton,
+    MDApp
 )
 
 api_key=os.getenv("MAPS_API_KEY")
-print(api_key)
 
 # URL de la API de Autocompletar
 url = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
@@ -25,11 +26,13 @@ url = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
 class LayoutSD(MDBoxLayout):
     pass
 
-class Botones(MDRaisedButton):
-    pass
-
 class ClientesScreen(Screen):
-    layout=LayoutSD()
+    layout=None
+
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        self.layout=LayoutSD()
+
     #Busqueda consulta inicial de los clientes:
     def get_clientes(self):
         _clientes=bd.child('clientes').get()
@@ -42,33 +45,12 @@ class ClientesScreen(Screen):
         self.ids.clientes_list.add_widget(
             OneLineListItem(
                 text=clientes.val()['nombre']+' '+clientes.val()['apellido'],
-                on_release=lambda x, key=clientes.key(): self.select_user(key)
+                on_release=lambda x, key=clientes.key(): self.set_state('view',key)
             )
         )
 
 
     #Funciones y atributos para el funcionamiento de la pantalla
-    def select_user(self,user):
-        self.ids.clientes_manager.current='detalles_cliente'
-        user_id=user
-        user=bd.child('clientes/'+user).get()
-        for i in ('id_user','nombre','apellido','telefono','rfc','domicilio_fiscal','razon_social','regimen_fiscal'):
-            try:
-                if i=='id_user':self.ids.id_user.text=user_id
-                else:self.ids[i].text=(user.val()).get(i)
-            except:
-                print(i)
-        domicilio=(user.val()).get('domicilio')
-        if domicilio is None or len(domicilio)==0:self.ids.mapa_layout.add_widget(LayoutSD());return None
-        else:
-            for i in domicilio:
-                self.ids.mapa.zoom=17
-                self.ids.mapa.add_marker(MapMarkerPopup(lat=domicilio[0]['lat'], lon=domicilio[0]['lon'],source='Assets\images\map_marker.png'))
-        self.ids.mapa_layout.add_widget(MDRaisedButton(
-                    text='Agregar domicilio',
-                    md_bg_color='#089cba',
-                    pos_hint={'right':.95,'top':.95}))
-
     def add_address(self,wdg):
         for i in self.ids.mapa.children:
             if isinstance(i,MapMarkerPopup):self.ids.mapa.remove_widget(i)
@@ -76,13 +58,21 @@ class ClientesScreen(Screen):
         self.ids.mapa_layout.remove_widget(wdg)
 
     def busqueda(self,text):
+        if len(text)==0:
+            self.ids.clientes_list.clear_widgets()
+            for i in clientes:
+                self.ids.clientes_list.add_widget(OneLineListItem(
+                    text=clientes[i]['nombre']+' '+clientes[i]['apellido'],
+                    on_release=lambda x, key=i: self.set_state('view',key)
+                    )
+                )
         if len(text)<3: return None
         self.ids.clientes_list.clear_widgets()
         for i in clientes:
             if str(i)==text or (text.upper() in clientes[i]['nombre'].upper()+' '+clientes[i]['apellido'].upper()):
                 self.ids.clientes_list.add_widget(OneLineListItem(
                     text=clientes[i]['nombre']+' '+clientes[i]['apellido'],
-                    on_release=lambda x, key=i: self.select_user(key)
+                    on_release=lambda x, key=i: self.set_state('view',key)
                     )
                 )
     
@@ -95,18 +85,7 @@ class ClientesScreen(Screen):
             if isinstance(i,MapMarkerPopup) or isinstance(i,LayoutSD):
                 self.ids.mapa_layout.remove_widget(i)
         self.ids.mapa.zoom=12
-        self.ids.mapa.center_on(22.763704, -102.555196)
-    
-    def clean_filters(self):
-        self.ids.clientes_list.clear_widgets()
-        for i in clientes:
-            self.ids.clientes_list.add_widget(OneLineListItem(
-                text=clientes[i]['nombre']+' '+clientes[i]['apellido'],
-                on_release=lambda x, key=i: self.select_user(key)
-                )
-            )
-        self.ids.fldSearch.text=''
-
+        self.ids.mapa.center_on(22.763704, -102.555196)     
     
     def guardar_cambios(self):
         data={}
@@ -131,9 +110,9 @@ class ClientesScreen(Screen):
         for i in self.ids.datos.children:
             if isinstance(i,MDTextField) and not i.hint_text=='ID de usuario':
                 i.disabled=False
-        for widget in self.ids.buttons_layout.children:
-            if isinstance(widget,Botones):self.ids.buttons_layout.remove_widget(widget)
-        for i in ('Cancelar','Guardar'):self.ids.buttons_layout.add_widget(Botones(text=i))
+        #for widget in self.ids.buttons_layout.children:
+        #    if isinstance(widget,Botones):self.ids.buttons_layout.remove_widget(widget)
+        #for i in ('Cancelar','Guardar'):self.ids.buttons_layout.add_widget(Botones(text=i))
 
     def eliminar(self):
         bd.child(f'clientes/{self.ids.id_user.text}').remove()
@@ -145,13 +124,6 @@ class ClientesScreen(Screen):
         self.ids.clientes_list.clear_widgets()
         Thread(target=self.get_clientes()).start()
     
-    def nuevo_usuario(self):
-        self.ids.clientes_manager.current='detalles_cliente'
-        for i in ('id_user','nombre','apellido','telefono','rfc','domicilio_fiscal','razon_social','regimen_fiscal'):
-            self.ids[i].disabled=False
-            self.ids[i].text=""
-        self.ids.mapa_layout.add_widget(LayoutSD())
-
     def define_ubi(self,id):
         print(id)
         global api_key,url
@@ -227,19 +199,41 @@ class ClientesScreen(Screen):
                 for i in res:print(i)
                 return res
     
-    def set_state(self,state:str):
+    def set_state(self,state:str,user=''):
         flds=('id_user','nombre','apellido','telefono','rfc','domicilio_fiscal','razon_social','regimen_fiscal')
         if state=='nothing':
             self.ids.clientes_manager.current='lista_clientes'
         if state=='new':
             self.ids.clientes_manager.current='detalles_cliente'
             for i in flds:
-                if i=='id_user':self.ids[i].disabled=True
                 self.ids[i].text=''
+                if i=='id_user':self.ids[i].disabled=True;continue
                 self.ids[i].disabled=False
         if state=='edit':
-            pass
+            for i in flds:
+                if i=='id_user':self.ids[i].disabled=True
+                self.ids[i].disabled=False
         if state=='view':
-            pass
+            self.ids.clientes_manager.current='detalles_cliente'
+            for i in flds:
+                self.ids[i].disabled=True
+            user_id=user if not user=='' else self.ids.id_user.text
+            user=bd.child('clientes/'+user).get()
+            for i in ('id_user','nombre','apellido','telefono','rfc','domicilio_fiscal','razon_social','regimen_fiscal'):
+                try:
+                    if i=='id_user':self.ids.id_user.text=user_id
+                    else:self.ids[i].text=(user.val()).get(i)
+                except:
+                    print(i)
+            domicilio=(user.val()).get('domicilio')
+            if domicilio is None or len(domicilio)==0:self.ids.mapa_layout.add_widget(self.layout);return None
+            else:
+                for i in domicilio:
+                    self.ids.mapa.zoom=17
+                    self.ids.mapa.add_marker(MapMarkerPopup(lat=domicilio[0]['lat'], lon=domicilio[0]['lon'],source='Assets\images\map_marker.png'))
+            self.ids.mapa_layout.add_widget(MDRaisedButton(
+                        text='Agregar domicilio',
+                        md_bg_color='#089cba',
+                        pos_hint={'right':.95,'top':.95}))
         if state=='add_adress':
             pass
