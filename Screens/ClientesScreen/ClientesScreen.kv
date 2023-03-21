@@ -18,10 +18,8 @@
             text:'Agregar domicilio'
             md_bg_color:'#089cba'
             pos_hint:{'right':.95,'top':.95}
-            on_release:app.root.ids.main_manager.get_screen('Clientes_Screen').add_address(root)
+            on_release:app.root.ids.main_manager.get_screen('Clientes_Screen').set_state('add_adress')
     MDFloatLayout:
-
-<Botones>:
 
 <ClientesScreen>:
     name:'Clientes_Screen'
@@ -76,6 +74,10 @@
                                     clientes_manager.current='lista_clientes'
                                     root.clean()
                             MDFloatLayout:
+                            MDBoxLayout:
+                                size_hint_x:None
+                                id:layout_btns
+                                width:self.minimum_width
                         MDLabel:
                             text:'Datos generales:'
                             adaptive_height:True
@@ -90,6 +92,7 @@
                             size_hint_y:None
                             height:'50dp'
                             disabled:True
+                            write_tab:False
                         MDTextField:
                             icon_left:'account'
                             hint_text:'Nombre(s)'
@@ -97,6 +100,7 @@
                             size_hint_y:None
                             height:'50dp'
                             disabled:True
+                            write_tab:False
                         MDTextField:
                             icon_left:'account'
                             hint_text:'Apellido(s)'
@@ -104,6 +108,7 @@
                             size_hint_y:None
                             height:'50dp'
                             disabled:True
+                            write_tab:False
                         MDTextField:
                             icon_left:'phone-classic'
                             hint_text:'Teléfono'
@@ -111,6 +116,7 @@
                             size_hint_y:None
                             height:'50dp'
                             disabled:True
+                            write_tab:False
                         MDLabel:
                             text:'Datos fiscales:'
                             adaptive_height:True
@@ -125,6 +131,7 @@
                             height:'50dp'
                             id:rfc
                             disabled:True
+                            write_tab:False
                         MDTextField:
                             icon_left:'map-marker'
                             hint_text:'Domicilio Fiscal'
@@ -132,6 +139,7 @@
                             size_hint_y:None
                             height:'50dp'
                             disabled:True
+                            write_tab:False
                         MDTextField:
                             icon_left:'account'
                             hint_text:'Razón Social'
@@ -139,6 +147,7 @@
                             size_hint_y:None
                             height:'50dp'
                             disabled:True
+                            write_tab:False
                         MDTextField:
                             icon_left:'account'
                             hint_text:'Régimen Fiscal'
@@ -146,6 +155,7 @@
                             size_hint_y:None
                             height:'50dp'
                             disabled:True
+                            write_tab:False
             Screen:
                 name:'add_address'
                 MDBoxLayout:
@@ -162,19 +172,26 @@
                             id:datos
                     MDBoxLayout:
                         spacing:10
-                        MDRaisedButton:
-                            size_hint_x:1
-                            text:'Cancelar'
-                            md_bg_color: "#990000"
-                            on_release:clientes_manager.current="detalles_cliente"
-                        MDRaisedButton:
-                            size_hint_x:1
-                            text:'Guardar'
-                            md_bg_color: "#089cba"
+                        size_hint_y:None
+                        height:self.minimum_height
+                        MDFlatButton:
+                            text: "Cancelar"
+                            on_release:
+                                if not root.search_marker is None:mapa.remove_marker(root.search_marker)
+                                clientes_manager.current="detalles_cliente"
+                                root.set_markers(root.markers_list)
+                        MDFlatButton:
+                            text: "Guardar"
+                            theme_text_color: "Custom"
+                            text_color: "#089cba"
+                            on_release:
+                                root.add_address()
+
         MDCard:
             elevation:1
             RelativeLayout:
                 id:mapa_layout
+                size_hint:1,1
                 MapView:
                     id:mapa
                     zoom:12

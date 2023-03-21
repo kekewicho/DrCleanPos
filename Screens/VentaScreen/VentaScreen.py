@@ -16,7 +16,8 @@ from utils import (
     date,
     bd,
     lista_precios,
-    clientes
+    clientes,
+    Thread
 )
 from Widgets.widgets import BtnServicio
 
@@ -281,6 +282,7 @@ class VentaScreen(Screen):
                 text_color="#ffffff",)).open()
 
         self.clean()
+        Thread(target=self.manager.get_screen('Notas_Screen').load_data()).start()
     
     def abono(self):
         def cancelar(object):

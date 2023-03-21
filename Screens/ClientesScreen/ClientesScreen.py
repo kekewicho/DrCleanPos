@@ -4,7 +4,6 @@ from utils import (
     Screen,
     bd,
     OneLineListItem,
-    Image,
     MDTextField,
     MDRaisedButton,
     MDSnackbar,
@@ -15,8 +14,9 @@ from utils import (
     clientes,
     Thread,
     MDIconButton,
-    MDApp
 )
+
+from Widgets.widgets import DomicilioMarker
 
 api_key=os.getenv("MAPS_API_KEY")
 
@@ -24,10 +24,13 @@ api_key=os.getenv("MAPS_API_KEY")
 url = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
 
 class LayoutSD(MDBoxLayout):
-    pass
+    def remove(self):
+        self.parent.remove_widget(self)
 
 class ClientesScreen(Screen):
     layout=None
+    markers_list=[]
+    search_marker=None
 
     def __init__(self, **kw):
         super().__init__(**kw)
@@ -51,11 +54,12 @@ class ClientesScreen(Screen):
 
 
     #Funciones y atributos para el funcionamiento de la pantalla
-    def add_address(self,wdg):
-        for i in self.ids.mapa.children:
-            if isinstance(i,MapMarkerPopup):self.ids.mapa.remove_widget(i)
-        self.ids.clientes_manager.current='add_address'
-        self.ids.mapa_layout.remove_widget(wdg)
+    def add_address(self):
+        self.markers_list.append(self.search_marker)
+        self.clear_markers()
+        self.set_markers(self.markers_list)
+        self.ids.clientes_manager.current='detalles_cliente'
+        self.search_marker=None
 
     def busqueda(self,text):
         if len(text)==0:
@@ -88,13 +92,11 @@ class ClientesScreen(Screen):
         self.ids.mapa.center_on(22.763704, -102.555196)     
     
     def guardar_cambios(self):
-        data={}
-        for i in self.ids.datos.children:
-            if isinstance(i,MDTextField) and not i.hint_text=='ID de usuario':
-                if len(i.text)>0:data[list(self.ids.keys())[list(self.ids.values()).index(i)]]=i.text
+        data=self.recabar_datos()
         if len(self.ids.id_user.text)==0:
             new_user=bd.child('clientes').push(data)
             userid=new_user['name']
+            print(data)
             print(userid)
             clientes[userid]=data
             MDSnackbar(MDLabel(text='Cliente registrado con éxito',theme_text_color="Custom",
@@ -104,15 +106,10 @@ class ClientesScreen(Screen):
             MDSnackbar(MDLabel(text='Cliente actualizado con éxito',theme_text_color="Custom",
                 text_color="#ffffff",)).open()
         self.clean()
+        self.ids.clientes_manager.current='lista_clientes'
+        self.ids.clientes_list.clear_widgets()
+        Thread(target=self.get_clientes()).start()
 
-
-    def modificar(self):
-        for i in self.ids.datos.children:
-            if isinstance(i,MDTextField) and not i.hint_text=='ID de usuario':
-                i.disabled=False
-        #for widget in self.ids.buttons_layout.children:
-        #    if isinstance(widget,Botones):self.ids.buttons_layout.remove_widget(widget)
-        #for i in ('Cancelar','Guardar'):self.ids.buttons_layout.add_widget(Botones(text=i))
 
     def eliminar(self):
         bd.child(f'clientes/{self.ids.id_user.text}').remove()
@@ -124,7 +121,7 @@ class ClientesScreen(Screen):
         self.ids.clientes_list.clear_widgets()
         Thread(target=self.get_clientes()).start()
     
-    def define_ubi(self,id):
+    def define_ubi(self,id,details):
         print(id)
         global api_key,url
         # URL de la API de Detalles de Lugar
@@ -153,13 +150,28 @@ class ClientesScreen(Screen):
         print(lat,lng)
         self.ids.mapa.center_on(lat, lng)
         self.ids.mapa.zoom=17
-        if len(self.ids.mapa_layout.children)<2:self.ids.mapa_layout.add_widget(
-            Image(
-            source="Assets\\images\\map_marker.png",
-            pos_hint={'center_x':.5,'y':0.025}
-            )
-        )
+        if self.search_marker is None:
+            marker=DomicilioMarker(lat=lat,lon=lng,detalles_domicilio={'domicilio':details})
+            self.search_marker=marker
+            self.ids.mapa.add_marker(self.search_marker)
+        else:
+            self.search_marker.lat,self.search_marker.lon=lat,lng
+            self.search_marker.detalles_domicilio=details
 
+    def clear_markers(self):
+        for i in self.markers_list:self.ids.mapa.remove_marker(i)
+    
+    def set_markers(self,data):
+        if len(data)==0:self.ids.mapa_layout.add_widget(self.layout);return None
+        lat=0
+        lon=0
+        for i in data:
+            self.ids.mapa.add_marker(i)
+            lat+=i.lat
+            lon+=i.lon
+        lat_prom,lon_prom=lat/len(data),lon/len(data)
+        self.ids.mapa.center_on(lat_prom, lon_prom)
+        self.ids.mapa.zoom=12
 
     def show_sugest(self,data):
         data=self.get_ubi(data)
@@ -168,7 +180,7 @@ class ClientesScreen(Screen):
             id_value = i[1]  # Guarda el valor de 'data' en una variable
             self.ids.datos.add_widget(OneLineListItem(
                 text=i[0],
-                on_release=lambda _, id=id_value: self.define_ubi(id)
+                on_release=lambda _, id=id_value: self.define_ubi(id,i[0])
                 ))
 
 
@@ -201,6 +213,8 @@ class ClientesScreen(Screen):
     
     def set_state(self,state:str,user=''):
         flds=('id_user','nombre','apellido','telefono','rfc','domicilio_fiscal','razon_social','regimen_fiscal')
+        self.ids.layout_btns.clear_widgets()
+        
         if state=='nothing':
             self.ids.clientes_manager.current='lista_clientes'
         if state=='new':
@@ -209,10 +223,13 @@ class ClientesScreen(Screen):
                 self.ids[i].text=''
                 if i=='id_user':self.ids[i].disabled=True;continue
                 self.ids[i].disabled=False
+            self.ids.layout_btns.add_widget(MDIconButton(icon='content-save-all',on_release=lambda x:self.guardar_cambios()))
+            self.ids.mapa_layout.add_widget(self.layout)
         if state=='edit':
             for i in flds:
-                if i=='id_user':self.ids[i].disabled=True
+                if i=='id_user':self.ids[i].disabled=True;continue
                 self.ids[i].disabled=False
+            self.ids.layout_btns.add_widget(MDIconButton(icon='content-save-all',on_release=lambda x:self.guardar_cambios()))
         if state=='view':
             self.ids.clientes_manager.current='detalles_cliente'
             for i in flds:
@@ -226,14 +243,40 @@ class ClientesScreen(Screen):
                 except:
                     print(i)
             domicilio=(user.val()).get('domicilio')
+
+            self.ids.layout_btns.add_widget(MDIconButton(icon='account-edit',on_release=lambda x:self.set_state('edit')))
+            self.ids.layout_btns.add_widget(MDIconButton(icon='account-remove',on_release=lambda x:self.eliminar()))
+
+
             if domicilio is None or len(domicilio)==0:self.ids.mapa_layout.add_widget(self.layout);return None
             else:
                 for i in domicilio:
-                    self.ids.mapa.zoom=17
-                    self.ids.mapa.add_marker(MapMarkerPopup(lat=domicilio[0]['lat'], lon=domicilio[0]['lon'],source='Assets\images\map_marker.png'))
+                    pass
+                    #address=DomicilioMarker(lat=domicilio[0]['lat'], lon=domicilio[0]['lon'],detalles_domicilio={'domicilio':})
+                    #address=MapMarkerPopup(lat=domicilio[0]['lat'], lon=domicilio[0]['lon'],source='Assets\images\map_marker.png')
+                    #self.ids.mapa.add_marker(address)
+                    #self.markers_list.append(address)
             self.ids.mapa_layout.add_widget(MDRaisedButton(
                         text='Agregar domicilio',
                         md_bg_color='#089cba',
                         pos_hint={'right':.95,'top':.95}))
         if state=='add_adress':
-            pass
+            self.ids.clientes_manager.current='add_address'
+            self.clear_markers()
+            self.ids.mapa_layout.remove_widget(self.layout)
+
+
+
+    def recabar_datos(self):
+        data={}
+        for i in ('regimen_fiscal','razon_social','domicilio_fiscal','rfc','telefono','apellido','nombre','id_user'):
+            if not len(self.ids[i].text)==0:data[i]=self.ids[i].text
+        addresses=[]
+        if not len(self.markers_list)==0:
+            for i in self.markers_list:
+                address={}
+                address['descripcion']=i.detalles_domicilio['domicilio']
+                address['lat']=i.lat
+                address['lon']=i.lon
+                addresses.append(address)
+        return data

@@ -1,7 +1,86 @@
 <ActivosScreen>
     name:"Activos_Screen"
-    on_enter:root.add_card()
-    MDAnchorLayout:
-        anchor_x:'center'
-        anchor_y:'center'
-        id:ly
+    MDBoxLayout:
+        orientation:'vertical'
+        MDAnchorLayout:
+            size_hint_y:None
+            MDRelativeLayout:
+                md_bg_color:"#dadada"
+                radius:10
+                size_hint:None,None
+                height:'40dp'
+                width:'600dp'
+                MDFloatLayout:
+                    id:selector
+                    size_hint:.185,.8
+                    pos_hint:{'center_x':1/10,'center_y':.5}
+                    md_bg_color:1,1,1,1
+                    radius:10
+                MDBoxLayout:
+                    selected:1
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        MDFlatButton:
+                            text:'Todo'
+                            on_release:
+                                root.selector(1/10)
+                                for i in self.parent.parent.children: i.children[0].active=False
+                                self.active=True
+                            font_name:'Regular'
+                            id:s_abono
+                            active:True
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        MDFlatButton:
+                            text:'Por recolectar'
+                            id:c_abono
+                            on_release:
+                                root.selector(3/10)
+                                for i in self.parent.parent.children: i.children[0].active=False
+                                self.active=True
+                            font_name:'Regular'
+                            active:False
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        MDFlatButton:
+                            text:'En sucursal'
+                            id:pago_total
+                            on_release:
+                                root.selector(5/10)
+                                for i in self.parent.parent.children: i.children[0].active=False
+                                self.active=True
+                            font_name:'Regular'
+                            active:False
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        MDFlatButton:
+                            text:'Listo para entrega'
+                            id:pago_total
+                            on_release:
+                                root.selector(7/10)
+                                for i in self.parent.parent.children: i.children[0].active=False
+                                self.active=True
+                            font_name:'Regular'
+                            active:False
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        MDFlatButton:
+                            text:'Rezagado'
+                            id:pago_total
+                            on_release:
+                                root.selector(9/10)
+                                for i in self.parent.parent.children: i.children[0].active=False
+                                self.active=True
+                            font_name:'Regular'
+                            active:False
+        MDAnchorLayout:
+            anchor_x:'center'
+            anchor_y:'center'
+            id:ly
+            MDFlatButton:
+                text:'add'

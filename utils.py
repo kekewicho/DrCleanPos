@@ -22,7 +22,6 @@ from threading import Thread
 from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-from Widgets.widgets import BtnServicio
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.card import MDCardSwipe, MDCard
 from kivy.animation import Animation
