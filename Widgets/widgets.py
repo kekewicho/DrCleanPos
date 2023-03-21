@@ -22,8 +22,8 @@ class DomicilioMarker(MapMarkerPopup):
         self.source='Assets\images\map_marker.png'
 
     def on_release(self):
+        pass
         # Open up the LocationPopupMenu
-        print(self.parent,self.parent.parent,self.parent.parent.parent,self.parent.parent.parent.parent)
         #menu = LocationPopupMenu(self.market_data)
         #menu.size_hint = [.8, .9]
         #menu.open()
