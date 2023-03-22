@@ -78,9 +78,9 @@
                                 self.active=True
                             font_name:'Regular'
                             active:False
-        MDAnchorLayout:
-            anchor_x:'center'
-            anchor_y:'center'
+        MDBoxLayout:
             id:ly
+            orientation:'vertical'
             MDFlatButton:
                 text:'add'
+                on_release:root.add_card()
