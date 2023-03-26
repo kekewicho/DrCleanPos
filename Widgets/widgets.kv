@@ -19,74 +19,83 @@
 <ActivosCard>:
     elevation:1
     size_hint:None,None
-    height:'300dp'
+    height:'200dp'
     width:'200dp'
     orientation:'vertical'
     padding:15
     spacing:10
-    MDLabel:
-        adaptive_height:True
-        font_name:'Bold'
-        font_size:'19sp'
-        text:'Luis Ruben Ramos Cortes'
+    ripple_behavior: True
+    MDBoxLayout:
         size_hint_y:None
-    MDAnchorLayout:
-        anchor_x:'center'
-        anchor_y:'center'
-        id:content
-        MDBoxLayout:
-            padding:20
-            spacing:20
+        height:self.minimum_height
+        MDLabel:
+            id:user_name
+            adaptive_height:True
+            font_name:'Regular'
+            font_size:'19sp'
+            text:'Luis Ruben Ramos Cortes'
             size_hint_y:None
+        MDFloatLayout:
+            size_hint:None,None
+            height:user_name.height
+            width:0
+            MDIconButton:
+                icon:'truck'
+                pos:(root.x+root.width-self.width/2-dp(5),root.y+root.height-self.height/2-dp(5))
+                md_bg_color:'#089cba'
+                theme_icon_color: "Custom"
+                icon_color: '#ffffff'
+                size:('55dp','55dp')
+    MDBoxLayout:
+        spacing:10
+        size_hint_y:None
+        height:self.minimum_height
+        MDIcon:
+            icon:'store-marker'
+        MDLabel:
+            text:'A domicilio'
+            adaptive_height:True
+    MDBoxLayout:
+        spacing:10
+        size_hint_y:None
+        height:self.minimum_height
+        MDIcon:
+            icon:'calendar-month'
+        MDLabel:
+            text:'25/Mar/2023'
+            adaptive_height:True
+    MDSeparator:
+    MDBoxLayout:
+        spacing:10
+        size_hint_y:None
+        height:self.minimum_height
+        MDBoxLayout:
             orientation:'vertical'
+            size_hint_y:None
             height:self.minimum_height
-            MDAnchorLayout:
-                anchor_x:'center'
-                anchor_y:'center'
-                MDIcon:
-                    icon:'clock'
-                    theme_text_color: "Custom"
-                    text_color: "#8d8d8d"
-                    font_size:'28sp'
-                    halign:'center'
-                    adaptive_height:True
             MDLabel:
-                text:'Nota pendiente de carga'
-                halign:'center'
-                theme_text_color: "Custom"
-                text_color: "#8d8d8d"
-                font_size:'17sp'
-                font_name:'Regular'
                 adaptive_height:True
-    MDBoxLayout:
-        size_hint_y:None
-        spacing:10
-        height:self.minimum_height
-        MDLabel:
-            adaptive_height:True
-            text:'Total:'
-            font_name:'Regular'
-            font_size:'15sp'
-            halign:'right'
-        MDLabel:
-            size_hint_x:.3
-            adaptive_height:True
-            text:'$-.--'
-            font_name:'Regular'
-            font_size:'15sp'
-    MDBoxLayout:
-        size_hint_y:None
-        spacing:10
-        height:self.minimum_height
-        MDLabel:
-            adaptive_height:True
-            text:'Saldo:'
-            font_name:'Regular'
-            font_size:'15sp'
-            halign:'right'
-        MDLabel:
-            size_hint_x:.3
-            adaptive_height:True
-            text:'$-.--'
-            font_name:'Regular'
-            font_size:'15sp'
+                text:'Total'
+                font_name:'Regular'
+                font_size:'14sp'
+            MDLabel:
+                adaptive_height:True
+                text:'$459.60'
+                font_name:'Regular'
+                font_size:'14sp'
+        MDBoxLayout:
+            orientation:'vertical'
+            size_hint_y:None
+            height:self.minimum_height
+            MDLabel:
+                adaptive_height:True
+                text:'Saldo'
+                font_name:'Regular'
+                font_size:'14sp'
+                halign:'right'
+            MDLabel:
+                adaptive_height:True
+                text:'$200.00'
+                font_name:'Regular'
+                font_size:'14sp'
+                halign:'right'

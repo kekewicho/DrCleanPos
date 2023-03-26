@@ -11,4 +11,4 @@ class ActivosScreen(Screen):
         anim.start(self.ids.selector)
     
     def add_card(self):
-        self.ids.ly.add_widget(ActivosCard())
+        self.ids.activos_layout.add_widget(ActivosCard())

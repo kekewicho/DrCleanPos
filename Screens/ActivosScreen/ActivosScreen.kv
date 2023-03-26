@@ -78,9 +78,12 @@
                                 self.active=True
                             font_name:'Regular'
                             active:False
-        MDBoxLayout:
-            id:ly
-            orientation:'vertical'
-            MDFlatButton:
-                text:'add'
-                on_release:root.add_card()
+        ScrollView:
+            MDStackLayout:
+                adaptive_height:True
+                padding:40
+                spacing:40
+                id:activos_layout
+                MDFlatButton:
+                    text:'add'
+                    on_release:root.add_card()
