@@ -24,20 +24,20 @@
                         MDFlatButton:
                             text:'Todo'
                             on_release:
-                                root.selector(1/10)
+                                root.selector(1/10,self.text)
                                 for i in self.parent.parent.children: i.children[0].active=False
                                 self.active=True
                             font_name:'Regular'
-                            id:s_abono
+                            id:selectorTodo
                             active:True
                     MDAnchorLayout:
                         anchor_x:'center'
                         anchor_y:'center'
                         MDFlatButton:
                             text:'Por recolectar'
-                            id:c_abono
+                            id:selectorRecolectar
                             on_release:
-                                root.selector(3/10)
+                                root.selector(3/10,'recoleccion')
                                 for i in self.parent.parent.children: i.children[0].active=False
                                 self.active=True
                             font_name:'Regular'
@@ -47,9 +47,9 @@
                         anchor_y:'center'
                         MDFlatButton:
                             text:'En sucursal'
-                            id:pago_total
+                            id:selectorSucursal
                             on_release:
-                                root.selector(5/10)
+                                root.selector(5/10,'sucursal')
                                 for i in self.parent.parent.children: i.children[0].active=False
                                 self.active=True
                             font_name:'Regular'
@@ -59,9 +59,9 @@
                         anchor_y:'center'
                         MDFlatButton:
                             text:'Listo para entrega'
-                            id:pago_total
+                            id:selectorEntrega
                             on_release:
-                                root.selector(7/10)
+                                root.selector(7/10,'entrega')
                                 for i in self.parent.parent.children: i.children[0].active=False
                                 self.active=True
                             font_name:'Regular'
@@ -71,9 +71,9 @@
                         anchor_y:'center'
                         MDFlatButton:
                             text:'Rezagado'
-                            id:pago_total
+                            id:selectorRezagado
                             on_release:
-                                root.selector(9/10)
+                                root.selector(9/10,self.text)
                                 for i in self.parent.parent.children: i.children[0].active=False
                                 self.active=True
                             font_name:'Regular'

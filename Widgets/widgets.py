@@ -18,6 +18,7 @@ class ActivosCard(MDCard):
     status=StringProperty()
     aDomicilio=BooleanProperty()
     content=ObjectProperty()
+    fecha=StringProperty()
 
     status_config={
         'recoleccion':{
@@ -39,6 +40,7 @@ class ActivosCard(MDCard):
         self.id_nota=idNota
         self.status=status
         self.aDomicilio=aDomicilio
+        self.fecha=fecha
 
         self.setStatus(status)
         self.ids.user_name.text=userName
