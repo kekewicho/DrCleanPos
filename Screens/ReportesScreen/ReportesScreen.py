@@ -5,7 +5,8 @@ from utils import (
     bd,
     plt,
     ticker,
-    mainthread
+    mainthread,
+    Thread
 )
 
 
@@ -29,10 +30,12 @@ class ReportesScreen(Screen):
 
     @mainthread
     def render_plot_ventasmes(self,ventas:pd.DataFrame):
-        df=ventas[['fecha','total']]
+        df=ventas
         df['fecha'] = pd.to_datetime(df['fecha'])
+        Thread(target=self.manager.get_screen('Activos_Screen').set_cards(df[df['status']!='finalizado'])).start()
         df['mes'] = df['fecha'].dt.month
         df['mes']=df['mes'].apply(self.get_month_name)
+        df=ventas[['fecha','total']]
         df=df[df['fecha'].dt.year==pd.Timestamp.now().year]
         ventas_por_mes = df.groupby('mes').sum()
 

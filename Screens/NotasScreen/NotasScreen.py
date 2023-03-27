@@ -59,7 +59,6 @@ class NotasScreen(Screen):
         self.notas['saldo']=self.notas['total']-self.notas['abonos']
 
         Thread(self.manager.get_screen('Reportes_Screen').render_plot_ventasmes(self.notas)).start()
-        Thread(self.manager.get_screen('Activos_Screen').set_cards(self.notas[self.notas['status']!='finalizado'])).start()
 
         data_ventas=self.notas[['usuario_name','fecha','a domicilio','total','saldo','usuario']]
         data_ventas['total']=data_ventas['total'].apply(lambda x:'${:,.2f}'.format(x))
