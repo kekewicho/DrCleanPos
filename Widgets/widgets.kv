@@ -33,16 +33,14 @@
             adaptive_height:True
             font_name:'Regular'
             font_size:'19sp'
-            text:'Luis Ruben Ramos Cortes'
             size_hint_y:None
         MDFloatLayout:
             size_hint:None,None
             height:user_name.height
             width:0
             MDIconButton:
-                icon:'truck'
+                id:statusIcon
                 pos:(root.x+root.width-self.width/2-dp(5),root.y+root.height-self.height/2-dp(5))
-                md_bg_color:'#089cba'
                 theme_icon_color: "Custom"
                 icon_color: '#ffffff'
                 size:('55dp','55dp')
@@ -53,7 +51,7 @@
         MDIcon:
             icon:'store-marker'
         MDLabel:
-            text:'A domicilio'
+            id:aDomicilio
             adaptive_height:True
     MDBoxLayout:
         spacing:10
@@ -62,40 +60,50 @@
         MDIcon:
             icon:'calendar-month'
         MDLabel:
-            text:'25/Mar/2023'
+            id:fecha
             adaptive_height:True
     MDSeparator:
+
+<ContentNoCargada>:
+    spacing:10
+    MDIcon:
+        icon:'clock'
+    MDLabel:
+        text:'Nota pendiente de carga'
+        font_name:'Regular'
+        font_size:'16sp'
+
+<ContentCargada>:
+    spacing:10
+    size_hint_y:None
+    height:self.minimum_height
     MDBoxLayout:
-        spacing:10
+        orientation:'vertical'
         size_hint_y:None
         height:self.minimum_height
-        MDBoxLayout:
-            orientation:'vertical'
-            size_hint_y:None
-            height:self.minimum_height
-            MDLabel:
-                adaptive_height:True
-                text:'Total'
-                font_name:'Regular'
-                font_size:'14sp'
-            MDLabel:
-                adaptive_height:True
-                text:'$459.60'
-                font_name:'Regular'
-                font_size:'14sp'
-        MDBoxLayout:
-            orientation:'vertical'
-            size_hint_y:None
-            height:self.minimum_height
-            MDLabel:
-                adaptive_height:True
-                text:'Saldo'
-                font_name:'Regular'
-                font_size:'14sp'
-                halign:'right'
-            MDLabel:
-                adaptive_height:True
-                text:'$200.00'
-                font_name:'Regular'
-                font_size:'14sp'
-                halign:'right'
+        MDLabel:
+            adaptive_height:True
+            text:'Total'
+            font_name:'Regular'
+            font_size:'14sp'
+        MDLabel:
+            id:total
+            adaptive_height:True
+            font_name:'Regular'
+            font_size:'14sp'
+    MDBoxLayout:
+        orientation:'vertical'
+        size_hint_y:None
+        height:self.minimum_height
+        MDLabel:
+            adaptive_height:True
+            text:'Saldo'
+            font_name:'Regular'
+            font_size:'14sp'
+            halign:'right'
+        MDLabel:
+            adaptive_height:True
+            id:saldo
+            font_name:'Regular'
+            font_size:'14sp'
+            halign:'right'

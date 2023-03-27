@@ -1,14 +1,47 @@
 from utils import (
     Screen,
-    Animation
+    Animation,
+    mainthread,
+    bd,
+    MDSnackbar,
+    MDFlatButton,
+    MDLabel
 )
 
 from Widgets.widgets import ActivosCard
 
 class ActivosScreen(Screen):
+    def set_cards(self,data):
+        for key,value in data.iterrows():
+            self.add_card(value)
+
     def selector(self,pos):
         anim=Animation(size_hint=(0,0),duration=.1)+Animation(pos_hint={'center_x':pos},duration=.05)+Animation(size_hint=(.185,.8),duration=.2)
         anim.start(self.ids.selector)
+
+    @mainthread
+    def add_card(self,data):
+        card=ActivosCard(
+            idNota=data['index'],
+            userName=data['usuario_name'],
+            status=data['status'],
+            fecha=data['fecha'],
+            aDomicilio=data['a domicilio'],
+            total=data['total'],
+            saldo=data['saldo']
+            )
+        card.ids.statusIcon.on_release=lambda x=card:self.updateStatus(x)
+        self.ids.activos_layout.add_widget(card)
     
-    def add_card(self):
-        self.ids.activos_layout.add_widget(ActivosCard())
+    def updateStatus(self,card:ActivosCard):
+        status=card.status
+        if status=='recoleccion':new_status='sucursal'
+        if status=='sucursal':new_status='entrega'
+        if status=='entrega':new_status='finalizado'
+        bd.child(f'notas/{card.id_nota}').child('status').set(new_status)
+        if new_status=='finalizado':
+            self.ids.activos_layout.remove_widget(card)
+            MDSnackbar(MDLabel(text='El servicio ha sido marcado como entregado'),MDFlatButton(text='DESHACER',on_release=lambda x=card,old=status:x.setStatus(old))).open()
+            return None
+        card.setStatus(new_status)
+        MDSnackbar(MDLabel(text='Estatus de servicio actualizado'),MDFlatButton(text='DESHACER',on_release=lambda x=card,old=status:x.setStatus(old))).open()

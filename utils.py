@@ -26,6 +26,7 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.card import MDCardSwipe, MDCard
 from kivy.animation import Animation
 from kivymd.uix.list import MDList
+from kivy.properties import StringProperty,BooleanProperty,NumericProperty,ObjectProperty
 import os
 import requests
 import matplotlib
