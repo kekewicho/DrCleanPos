@@ -70,16 +70,16 @@ class ReportesScreen(Screen):
         self.ids.kpis_monto.text='${:,.2f}'.format(kpis_data.sum())
         dif=float(kpis_data.sum()/kpis_data_ant.sum())
         comparativo="+" if int(dif)>0 else "-"
-        self.ids.kpis_monto_comparacion.text=f"{comparativo}{'{:.1f}%'.format(dif%1)} que el mes anterior"
+        self.ids.kpis_monto_comparacion.text=f"{comparativo}{'{:.1f}%'.format((dif*100)%1)} que el mes anterior"
 
         #KPI cantidad
         self.ids.kpis_cantidad.text=str(kpis_data.shape[0])
         dif=float(kpis_data.shape[0]/kpis_data_ant.shape[0])
         comparativo="+" if int(dif)>0 else "-"
-        self.ids.kpis_cantidad_comparacion.text=f"{comparativo}{'{:.1f}%'.format(dif%1)} que el mes anterior"
+        self.ids.kpis_cantidad_comparacion.text=f"{comparativo}{'{:.1f}%'.format((dif*100)%1)} que el mes anterior"
         
         #KPI ticket promedio
         self.ids.kpis_monto.text='${:,.2f}'.format(kpis_data.mean())
         dif=float(kpis_data.mean()/kpis_data_ant.mean())
         comparativo="+" if int(dif)>0 else "-"
-        self.ids.kpis_monto_comparacion.text=f"{comparativo}{'{:.1f}%'.format(dif%1)} que el mes anterior"
+        self.ids.kpis_monto_comparacion.text=f"{comparativo}{'{:.1f}%'.format((dif*100)%1)} que el mes anterior"
