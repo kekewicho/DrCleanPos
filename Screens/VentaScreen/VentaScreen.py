@@ -264,7 +264,9 @@ class VentaScreen(Screen):
         data['envio']=float((self.ids.envio.text).replace('$','').replace(',',''))
         data['abonos']=float((self.ids.abono.text).replace('$','').replace(',',''))
         data['fecha']=str(fecha)
+        data['status']='sucursal'
         articulos=[]
+        total=0
         for i in self.ids.articulos_nota.children:
             item={}
             item['servicio']=i.ids.servicio.text
@@ -273,16 +275,15 @@ class VentaScreen(Screen):
             articulos.append(item)
         data['articulos']=articulos
         if idActual==None:
-            bd.child('notas').push(data)
+            user_id=bd.child('notas').push(data)
             MDSnackbar(MDLabel(text='Venta realizada con éxito',theme_text_color="Custom",
                 text_color="#ffffff",)).open()
         if idActual!=None:
             bd.child(f'notas/{idActual}').update(data)
             MDSnackbar(MDLabel(text='Nota actualizada con éxito',theme_text_color="Custom",
                 text_color="#ffffff",)).open()
-
         self.clean()
-        Thread(target=self.manager.get_screen('Notas_Screen').load_data()).start()
+
     
     def abono(self):
         def cancelar(object):
@@ -373,4 +374,3 @@ class VentaScreen(Screen):
         for i in ('subtotal','envio','descuento','abono','saldo'):
             self.ids[i].text='${:,.2f}'.format(0)
         if len(self.ids.user_area.children)>1:self.ids.user_area.remove_widget(self.ids.user_area.children[0])
-        

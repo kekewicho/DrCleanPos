@@ -18,7 +18,7 @@ class ActivosCard(MDCard):
     status=StringProperty()
     aDomicilio=BooleanProperty()
     content=ObjectProperty()
-    fecha=StringProperty()
+    fecha=None
 
     status_config={
         'recoleccion':{
@@ -35,7 +35,7 @@ class ActivosCard(MDCard):
             },
     }
 
-    def __init__(self,idNota:str,userName:str,status:str,fecha:str,aDomicilio:bool,total:float=0.00,saldo:float=0.00,*args,):
+    def __init__(self,idNota:str,userName:str,status:str,fecha,aDomicilio:bool,total:float=0.00,saldo:float=0.00,*args,):
         super().__init__(*args,)
         self.id_nota=idNota
         self.status=status

@@ -30,3 +30,4 @@ from kivy.properties import StringProperty,BooleanProperty,NumericProperty,Objec
 import os
 import requests
 import matplotlib
+from kivymd.utils import asynckivy as ak

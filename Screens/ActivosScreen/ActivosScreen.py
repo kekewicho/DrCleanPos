@@ -15,7 +15,7 @@ from Widgets.widgets import ActivosCard
 
 class ActivosScreen(Screen):
     servicios=[]
-    def set_cards(self,data:pd.Dataframe()):
+    def set_cards(self,data:pd.DataFrame()):
         for key,value in data.iterrows():
             self.add_card(value)
 
@@ -63,5 +63,5 @@ class ActivosScreen(Screen):
                 if i.status==selected:self.ids.activos_layout.add_widget(i)
         if selected=='Rezagado':
             for i in self.servicios:
-                if (pd.Timestamp.now().strftime('%Y-%m-%d')-pd.to_datetime(i.fecha)).days>=14:
+                if (pd.Timestamp.now()-pd.to_datetime(i.fecha)).days>=14:
                     self.ids.activos_layout.add_widget(i)
