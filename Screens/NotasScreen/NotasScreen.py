@@ -16,6 +16,7 @@ class BotonesNotas(MDIconButton):
     pass
 
 class NotasScreen(Screen):
+    dataTable=None
     #Construccion inicial de la pantalla
     def get_sub(self,artix):
         subtotal=0
@@ -66,8 +67,9 @@ class NotasScreen(Screen):
         data_ventas['saldo']=data_ventas['saldo'].apply(lambda x:('cash-clock',[248/256,236/256,14/256,1],'${:,.2f}'.format(x)) if x>0 else ('cash-check',[29/256,143/256,12/256,1],'${:,.2f}'.format(x)))
         data_ventas.sort_values(by='fecha',inplace=True,ascending=False)
         row_data = self.df_to_datatable(data_ventas)
-        self.create_dataTable(row_data)
-        print(self.notas.columns)
+        if self.dataTable is None:
+            self.create_dataTable(row_data)
+        else:self.dataTable.row_data=row_data
 
 
     #Codigo y funciones del funcionamiento de la pantalla de Notas

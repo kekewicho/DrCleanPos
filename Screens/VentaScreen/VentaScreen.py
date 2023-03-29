@@ -275,7 +275,11 @@ class VentaScreen(Screen):
             articulos.append(item)
         data['articulos']=articulos
         if idActual==None:
-            user_id=bd.child('notas').push(data)
+            id_nota=bd.child('notas').push(data)
+            data['total']=self.manager.get_screen('Notas_Screen').get_sub(data['articulos'])+data['envio']-data['descuentos']
+            data['saldo']=data['total']-data['abonos']
+            data['index']=id_nota['name']
+            self.manager.get_screen('Activos_Screen').add_card(data)
             MDSnackbar(MDLabel(text='Venta realizada con éxito',theme_text_color="Custom",
                 text_color="#ffffff",)).open()
         if idActual!=None:
@@ -283,6 +287,7 @@ class VentaScreen(Screen):
             MDSnackbar(MDLabel(text='Nota actualizada con éxito',theme_text_color="Custom",
                 text_color="#ffffff",)).open()
         self.clean()
+        self.manager.get_screen('Notas_Screen').load_data()
 
     
     def abono(self):

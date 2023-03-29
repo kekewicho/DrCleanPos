@@ -31,17 +31,13 @@ class ReportesScreen(Screen):
     @mainthread
     def render_plot_ventasmes(self,ventas:pd.DataFrame):
         df=ventas
-        df['fecha'] = pd.to_datetime(df['fecha'])
         Thread(target=self.manager.get_screen('Activos_Screen').set_cards(df[df['status']!='finalizado'])).start()
+        df['fecha'] = pd.to_datetime(df['fecha'])
         df['mes'] = df['fecha'].dt.month
         df['mes']=df['mes'].apply(self.get_month_name)
-        df=ventas[['fecha','total']]
         df=df[df['fecha'].dt.year==pd.Timestamp.now().year]
+        df=ventas[['mes','total','fecha']]
         ventas_por_mes = df.groupby('mes').sum()
-
-        # Imprime las ventas por mes
-        print(ventas_por_mes)
-
 
         # Crea el gráfico
         fig, ax = plt.subplots()
