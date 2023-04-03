@@ -1,6 +1,5 @@
 from utils import (
     Screen,
-    mainthread,
     MDDialog,
     MDFlatButton,
     MDIconButton,
@@ -17,7 +16,8 @@ from utils import (
     bd,
     lista_precios,
     clientes,
-    Thread
+    ak,
+    MDSeparator
 )
 from Widgets.widgets import BtnServicio
 
@@ -43,17 +43,14 @@ class VentaScreen(Screen):
 
     #Ejecución inicial de la app
     def load_services(self):
-        servicios=bd.child('servicios').get()
-        for i in servicios.each():
-            for j in i.val():
-                self.build_ui(j)
-                lista_precios[j]=i.val()[j]
-
-    @mainthread
-    def build_ui(self,txt):
-        cont=BtnServicio()
-        cont.ids.srvc.text= txt.replace('-',' / ')
-        self.ids.servicios.add_widget(cont)
+        async def load_services():
+            servicios=bd.child('servicios').get()
+            for i in servicios.each():
+                for j in i.val():
+                    await ak.sleep(0)
+                    self.ids.servicios.add_widget(BtnServicio(j,i.val()[j]))
+                    lista_precios[j]=i.val()[j]
+        ak.start(load_services())
 
     #Funciones de la pantalla
     def set_envio(self,state):
@@ -133,9 +130,14 @@ class VentaScreen(Screen):
             if cliente.upper() in str(clientes[i]['nombre']).upper() or cliente.upper() in str(clientes[i]['apellido']).upper():
                 item=UserItem()
                 item.ids.nombre.text=str(clientes[i].get('nombre'))+' '+str(clientes[i].get('apellido'))
-                item.ids.domicilio.text='Domicilio: '+str(clientes[i].get('domicilio'))
+                domicilio=clientes[i].get('domicilio')
+                if len(domicilio)==1:
+                    item.ids.domicilio.text='Domicilio: '+str(clientes[i].get('domicilio')[0]['descripcion'])
+                if len(domicilio)>1:
+                    item.ids.domicilio.text=f'{len(domicilio)} domicilios registrados'
                 item.ids.telefono.text='Teléfono: '+str(clientes[i].get('telefono'))
                 item.ids.userid.text=str(i)
+                lista.add_widget(MDSeparator())
                 lista.add_widget(item)
         self.dialog.content_cls.ids.lista_usuarios.add_widget(lista)
 
@@ -239,55 +241,54 @@ class VentaScreen(Screen):
         if subtotal-descuento>=300:return 0
 
     def venta(self,abono=0):
-        global selected_client,fecha,idActual
+        async def venta():
+            global selected_client,fecha,idActual
+            if selected_client=='':
+                MDSnackbar(MDLabel(text='No has selecionado ningun usuario',theme_text_color="Custom",
+                text_color="#ffffff",)).open()
+                return None
+            if len(self.ids.articulos_nota.children)==0:
+                MDSnackbar(MDLabel(text='La nota no contiene ningún artículo',theme_text_color="Custom",
+                text_color="#ffffff",)).open()
+                return None
         
-        if selected_client=='':
-            MDSnackbar(MDLabel(text='No has selecionado ningun usuario',theme_text_color="Custom",
-            text_color="#ffffff",)).open()
-            return None
-        if len(self.ids.articulos_nota.children)==0:
-            MDSnackbar(MDLabel(text='La nota no contiene ningún artículo',theme_text_color="Custom",
-            text_color="#ffffff",)).open()
-            return None
-       
-        if abono==-1:
-            total=float((self.ids.subtotal.text).replace('$','').replace(',',''))+float((self.ids.envio.text).replace('$','').replace(',',''))-float((self.ids.descuento.text).replace('$','').replace(',',''))
-            self.ids.abono.text='${:,.2f}'.format(total)
-        else:
-            self.ids.abono.text='${:,.2f}'.format(float((self.ids.abono.text).replace('$','').replace(',',''))+abono)
+            if abono==-1:
+                total=float((self.ids.subtotal.text).replace('$','').replace(',',''))+float((self.ids.envio.text).replace('$','').replace(',',''))-float((self.ids.descuento.text).replace('$','').replace(',',''))
+                self.ids.abono.text='${:,.2f}'.format(total)
+            else:
+                self.ids.abono.text='${:,.2f}'.format(float((self.ids.abono.text).replace('$','').replace(',',''))+abono)
 
-        data={}
-        data['usuario']=selected_client
-        data['usuario_name']=self.ids.user.text
-        data['a domicilio']=True if self.ids.check_envio.active else False
-        data['descuentos']=float((self.ids.descuento.text).replace('$','').replace(',',''))
-        data['envio']=float((self.ids.envio.text).replace('$','').replace(',',''))
-        data['abonos']=float((self.ids.abono.text).replace('$','').replace(',',''))
-        data['fecha']=str(fecha)
-        data['status']='sucursal'
-        articulos=[]
-        total=0
-        for i in self.ids.articulos_nota.children:
-            item={}
-            item['servicio']=i.ids.servicio.text
-            item['cantidad']=float('{:.2f}'.format(float(i.ids.cantidad.text)))
-            item['precio']=float((i.ids.precio.text).replace('$','').replace(',',''))
-            articulos.append(item)
-        data['articulos']=articulos
-        if idActual==None:
-            id_nota=bd.child('notas').push(data)
-            data['total']=self.manager.get_screen('Notas_Screen').get_sub(data['articulos'])+data['envio']-data['descuentos']
-            data['saldo']=data['total']-data['abonos']
-            data['index']=id_nota['name']
-            self.manager.get_screen('Activos_Screen').add_card(data)
-            MDSnackbar(MDLabel(text='Venta realizada con éxito',theme_text_color="Custom",
-                text_color="#ffffff",)).open()
-        if idActual!=None:
-            bd.child(f'notas/{idActual}').update(data)
-            MDSnackbar(MDLabel(text='Nota actualizada con éxito',theme_text_color="Custom",
-                text_color="#ffffff",)).open()
-        self.clean()
-        self.manager.get_screen('Notas_Screen').load_data()
+            data={}
+            data['usuario']=selected_client
+            data['usuario_name']=self.ids.user.text
+            data['a domicilio']=True if self.ids.check_envio.active else False
+            data['descuentos']=float((self.ids.descuento.text).replace('$','').replace(',',''))
+            data['envio']=float((self.ids.envio.text).replace('$','').replace(',',''))
+            data['abonos']=float((self.ids.abono.text).replace('$','').replace(',',''))
+            data['fecha']=str(fecha)
+            data['status']='sucursal'
+            articulos=[]
+            total=0
+            for i in self.ids.articulos_nota.children:
+                item={}
+                item['servicio']=i.ids.servicio.text
+                item['cantidad']=float('{:.2f}'.format(float(i.ids.cantidad.text)))
+                item['precio']=float((i.ids.precio.text).replace('$','').replace(',',''))
+                articulos.append(item)
+            data['articulos']=articulos
+            if idActual==None:
+                id_nota=bd.child('notas').push(data)
+                data=self.manager.get_screen('Notas_Screen').normalize_data(data)
+                data['index']=id_nota['name']
+                self.manager.get_screen('Activos_Screen').add_card(data)
+                MDSnackbar(MDLabel(text='Venta realizada con éxito',theme_text_color="Custom",
+                    text_color="#ffffff",)).open()
+            if idActual!=None:
+                bd.child(f'notas/{idActual}').update(data)
+                MDSnackbar(MDLabel(text='Nota actualizada con éxito',theme_text_color="Custom",
+                    text_color="#ffffff",)).open()
+            self.clean()
+        ak.start(venta())
 
     
     def abono(self):

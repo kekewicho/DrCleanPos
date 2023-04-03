@@ -9,7 +9,8 @@ from utils import (
     dp,
     mainthread,
     pd,
-    Thread
+    Thread,
+    ak
 )
 
 class BotonesNotas(MDIconButton):
@@ -18,69 +19,73 @@ class BotonesNotas(MDIconButton):
 class NotasScreen(Screen):
     dataTable=None
     #Construccion inicial de la pantalla
-    def get_sub(self,artix):
-        subtotal=0
-        for i in artix:
-            subtotal+=i.get('cantidad')*i.get('precio')
-        return subtotal
+    def normalize_data(self,df):
+        def get_sub(artix):
+            subtotal=0
+            for i in artix:
+                subtotal+=i.get('cantidad')*i.get('precio')
+            return subtotal
+        if type(df)==dict:df['subtotal']=get_sub(df['articulos'])
+        if type(df)==pd.DataFrame:df['subtotal']=df['articulos'].apply(get_sub)
+        df['total']=df['subtotal']+df['envio']-df['descuentos']
+        df['saldo']=df['total']-df['abonos']
+        return df
     
     def df_to_datatable(self,dataframe):
+        dataframe['total']=dataframe['total'].apply(lambda x:'${:,.2f}'.format(x))
+        dataframe['a domicilio']=dataframe['a domicilio'].apply(lambda x: 'SI' if x else 'NO')
+        dataframe['saldo']=dataframe['saldo'].apply(lambda x:('cash-clock',[248/256,236/256,14/256,1],'${:,.2f}'.format(x)) if x>0 else ('cash-check',[29/256,143/256,12/256,1],'${:,.2f}'.format(x)))
+        dataframe.sort_values(by='fecha',inplace=True,ascending=False)
+        dataframe['fecha'] = dataframe['fecha'].astype(str)
         row_data = dataframe.to_records(index=False)
         return row_data
     
     def on_check_press(self, instance_table, current_row):
         self.check()
     
-    @mainthread
-    def create_dataTable(self,row_data):
-        self.dataTable=MDDataTable(
-                elevation=2,
-                use_pagination=True,
-                row_data=row_data,
-                check=True,
-                column_data=[
-                    ("Cliente", dp(60)),
-                    ("Fecha", dp(30)),
-                    ("¿A domicilio?", dp(30)),
-                    ("Total", dp(30)),
-                    ("Saldo", dp(30)),
-                    ("ID de nota", dp(60)),
-                    ],
-                )
-        self.dataTable.bind(on_check_press=self.on_check_press)
-        self.children[0].add_widget(self.dataTable)
-
-
     def load_data(self):
-        data=bd.child('notas').get()
-        self.notas=pd.DataFrame(data.val(),index=None).transpose()
-        self.notas=self.notas.reset_index(drop=False)
-        self.notas['subtotal']=self.notas['articulos'].apply(self.get_sub)
-        self.notas['total']=self.notas['subtotal']+self.notas['envio']-self.notas['descuentos']
-        self.notas['saldo']=self.notas['total']-self.notas['abonos']
+        async def load_data():
+            data=bd.child('notas').get()
+            self.notas=pd.DataFrame(data.val(),index=None).transpose()
+            self.notas=self.notas.reset_index(drop=False)
+            self.notas=self.normalize_data(self.notas)
+            self.notas['fecha'] = self.notas['fecha'].astype(str)
 
-        Thread(self.manager.get_screen('Reportes_Screen').render_plot_ventasmes(self.notas)).start()
+            self.manager.get_screen('Reportes_Screen').render_plot_ventasmes(self.notas)
+            self.manager.get_screen('Activos_Screen').set_cards(self.notas[self.notas['status']!='finalizado'])
 
-        data_ventas=self.notas[['usuario_name','fecha','a domicilio','total','saldo','usuario']]
-        data_ventas['total']=data_ventas['total'].apply(lambda x:'${:,.2f}'.format(x))
-        data_ventas['a domicilio']=data_ventas['a domicilio'].apply(lambda x: 'SI' if x else 'NO')
-        data_ventas['saldo']=data_ventas['saldo'].apply(lambda x:('cash-clock',[248/256,236/256,14/256,1],'${:,.2f}'.format(x)) if x>0 else ('cash-check',[29/256,143/256,12/256,1],'${:,.2f}'.format(x)))
-        data_ventas.sort_values(by='fecha',inplace=True,ascending=False)
-        row_data = self.df_to_datatable(data_ventas)
-        if self.dataTable is None:
-            self.create_dataTable(row_data)
-        else:self.dataTable.row_data=row_data
+            data_ventas=self.notas[['usuario_name','fecha','a domicilio','total','saldo','index']]   
+            row_data = self.df_to_datatable(data_ventas)
+            if self.dataTable is None:
+                self.dataTable=MDDataTable(
+                    elevation=2,
+                    use_pagination=True,
+                    row_data=row_data,
+                    check=True,
+                    column_data=[
+                        ("Cliente", dp(60)),
+                        ("Fecha", dp(30)),
+                        ("¿A domicilio?", dp(30)),
+                        ("Total", dp(30)),
+                        ("Saldo", dp(30)),
+                        ("ID de nota", dp(60)),
+                        ],
+                    )
+                self.dataTable.bind(on_check_press=self.on_check_press)
+                self.children[0].add_widget(self.dataTable)
+            else:self.dataTable.row_data=row_data
+        ak.start(load_data())
 
 
     #Codigo y funciones del funcionamiento de la pantalla de Notas
     date_dialog=None
     def check(self):
-        if len(self.children[0].children[0].get_row_checks())==0:
+        if len(self.dataTable.get_row_checks())==0:
             self.ids.layout_btns.clear_widgets()
             return None
-        if len(self.children[0].children[0].get_row_checks())>1:
+        if len(self.dataTable.get_row_checks())>1:
             botones=('printer','file-image-outline','delete')
-        if len(self.children[0].children[0].get_row_checks())==1:
+        if len(self.dataTable.get_row_checks())==1:
             botones=('open-in-new','printer','file-image-outline','delete')
         self.ids.layout_btns.clear_widgets()
         for i in botones: self.ids.layout_btns.add_widget(BotonesNotas(icon=i,theme_icon_color= "Custom",icon_color= '#ffffff',rounded_button=False))
@@ -95,10 +100,9 @@ class NotasScreen(Screen):
         pass
 
     def open_nota(self):
-        notaid=self.children[0].children[0].get_row_checks()[0][-1]
-
+        notaid=self.dataTable.get_row_checks()[0][-1]
         self.manager.current='Venta_Screen'
-        nota=(bd.child('notas').order_by_key().equal_to(notaid).get())[0]
+        nota=bd.child(f'notas/{notaid}').get()
         scr=self.manager.get_screen('Venta_Screen')
         scr.clean()
 
@@ -131,11 +135,6 @@ class NotasScreen(Screen):
         data_ventas['fecha']=pd.to_datetime(data_ventas['fecha'],format='%Y-%m-%d')
         data_ventas=data_ventas[((data_ventas['index']==value) | (data_ventas['usuario_name'].str.upper().str.contains(value.upper())) | (data_ventas['usuario']==value)) & ((data_ventas['fecha']>=fi) & (data_ventas['fecha']<=ff))]
         data_ventas.drop('index', axis=1, inplace=True)
-        data_ventas['fecha']=data_ventas['fecha'].dt.date
-        data_ventas['total']=data_ventas['total'].apply(lambda x:'${:,.2f}'.format(x))
-        data_ventas['a domicilio']=data_ventas['a domicilio'].apply(lambda x: 'SI' if x else 'NO')
-        data_ventas['saldo']=data_ventas['saldo'].apply(lambda x:('cash-clock',[248/256,236/256,14/256,1],'${:,.2f}'.format(x)) if x>0 else ('cash-check',[29/256,143/256,12/256,1],'${:,.2f}'.format(x)))
-        data_ventas.sort_values(by='fecha',inplace=True,ascending=False)
         row_data = self.df_to_datatable(data_ventas)
         self.dataTable.row_data=row_data
 

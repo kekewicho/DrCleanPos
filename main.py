@@ -25,9 +25,9 @@ class DrCleanPOS(MDApp):
         return MainScreen()
     
     def on_start(self):
-        Thread(target=self.root.ids.main_manager.get_screen('Venta_Screen').load_services).start()
-        Thread(target=self.root.ids.main_manager.get_screen('Notas_Screen').load_data).start()
-        Thread(target=self.root.ids.main_manager.get_screen('Clientes_Screen').get_clientes).start()
+        self.root.ids.main_manager.get_screen('Venta_Screen').load_services()
+        self.root.ids.main_manager.get_screen('Notas_Screen').load_data()
+        self.root.ids.main_manager.get_screen('Clientes_Screen').get_clientes()
 
 if __name__=='__main__':
     for i in os.listdir('Assets/fonts'):

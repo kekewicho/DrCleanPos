@@ -6,12 +6,24 @@ from utils import (
     BooleanProperty,
     NumericProperty,
     ObjectProperty,
-    MDBoxLayout
+    MDBoxLayout,
+    MDDropdownMenu,
+    dp,
+    get_app,
+    Clipboard,
+    MDSnackbar,
+    MDLabel
 )
 Builder.load_file('Widgets\widgets.kv')
 
 class BtnServicio(MDCard):
-    pass
+    service=StringProperty()
+    costo=NumericProperty()
+
+    def __init__(self,servicio:str,costo:float,*args):
+        super().__init__(*args)
+        self.service=servicio.replace('-',' / ')
+        self.costo=costo
 
 class ActivosCard(MDCard):
     id_nota=StringProperty()
@@ -77,7 +89,7 @@ class ContentNoCargada(MDBoxLayout):
     pass
 
 class DomicilioMarker(MapMarkerPopup):
-    detalles_domicilio = {}
+    detalles_domicilio = StringProperty()
 
     def __init__(self,lat,lon,detalles_domicilio,*args):
         super().__init__(*args)
@@ -87,9 +99,42 @@ class DomicilioMarker(MapMarkerPopup):
         self.source='Assets\images\map_marker.png'
 
     def on_release(self):
-        pass
         # Open up the LocationPopupMenu
-        #menu = LocationPopupMenu(self.market_data)
-        #menu.size_hint = [.8, .9]
-        #menu.open()
+        menu_items = [
+            {
+                "text": 'Copiar datos',
+                "viewclass": "OneLineListItem",
+                "height":dp(56),
+                "on_release":lambda x=self.detalles_domicilio:self.copiar_datos()
+            },
+            {
+                "text": 'Eliminar',
+                "viewclass": "OneLineListItem",
+                "height":dp(56),
+                "on_release":lambda x=self:get_app().root.ids.main_manager.get_screen('Clientes_Screen').delete_address(x)
+            }
+        ]
+        self.menu = LocationMenu(
+            domicilio=self.detalles_domicilio,
+            caller=self,
+            items=menu_items,
+            width_mult=3,
+            position="top",
+            ver_growth="up"
+        )
+        self.menu.open()
+    
+    def copiar_datos(self):
+        root=get_app().root.ids.main_manager.get_screen('Clientes_Screen')
+        cliente=root.ids.nombre.text+' '+root.ids.apellido.text
+        text=f"Te comparto el domicilio de {cliente}\nDomicilio: {self.detalles_domicilio}\nGoogle Maps: https://www.google.com/maps?q={self.lat},{self.lon}"
+        Clipboard.copy(text)
+        MDSnackbar(MDLabel(text='¡Información copiada el portapapeles!',theme_text_color="Custom",
+                text_color="#ffffff",)).open()
+
+
+class LocationMenu(MDDropdownMenu):
+    def __init__(self,domicilio,**args):
+        super().__init__(**args)
+        
 

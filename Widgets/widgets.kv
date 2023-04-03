@@ -1,3 +1,4 @@
+#:import Clipboard kivy.core.clipboard.Clipboard
 <BtnServicio>:
     elevation:1
     padding:'3sp'
@@ -10,11 +11,12 @@
     orientation:'vertical'
     on_release:
         if self.children[0].text=='ROPA PARA LAV / KG':app.root.ids.main_manager.get_screen('Venta_Screen').get_cant()
-        else:app.root.ids.main_manager.get_screen('Venta_Screen').add_service(self.children[0].text)
+        else:app.root.ids.main_manager.get_screen('Venta_Screen').add_service(self.service)
     MDLabel:
         id:srvc
         font_name:'Regular'
         halign:'center'
+        text:root.service
 
 <ActivosCard>:
     elevation:1
@@ -24,7 +26,6 @@
     orientation:'vertical'
     padding:15
     spacing:10
-    ripple_behavior: True
     MDBoxLayout:
         size_hint_y:None
         height:self.minimum_height
@@ -107,3 +108,19 @@
             font_name:'Regular'
             font_size:'14sp'
             halign:'right'
+
+<LocationMenuHeader>:
+    orientation: "vertical"
+    padding: "4dp"
+
+    MDBoxLayout:
+        spacing: "12dp"
+
+        MDIcon:
+            icon: "map-marker"
+            pos_hint: {"center_y": .5}
+
+        MDLabel:
+            text: root.address
+            adaptive_size: True
+            pos_hint: {"center_y": .5}

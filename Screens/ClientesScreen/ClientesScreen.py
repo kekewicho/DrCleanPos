@@ -14,6 +14,7 @@ from utils import (
     clientes,
     Thread,
     MDIconButton,
+    ak
 )
 
 from Widgets.widgets import DomicilioMarker
@@ -39,21 +40,19 @@ class ClientesScreen(Screen):
 
     #Busqueda consulta inicial de los clientes:
     def get_clientes(self):
-        _clientes=bd.child('clientes').get()
-        for i in _clientes.each():
-            self.set_clientes(i)
-            clientes[i.key()]=i.val()
+        async def get_clientes():
+            _clientes=bd.child('clientes').get()
+            for i in _clientes.each():
+                await ak.sleep(0)
+                self.ids.clientes_list.add_widget(
+                OneLineListItem(
+                    text=i.val()['nombre']+' '+i.val()['apellido'],
+                    on_release=lambda x, key=i.key(): self.set_state('view',key)
+                    )
+                )
+                clientes[i.key()]=i.val()
+        ak.start(get_clientes())
     
-    @mainthread
-    def set_clientes(self,clientes):
-        self.ids.clientes_list.add_widget(
-            OneLineListItem(
-                text=clientes.val()['nombre']+' '+clientes.val()['apellido'],
-                on_release=lambda x, key=clientes.key(): self.set_state('view',key)
-            )
-        )
-
-
     #Funciones y atributos para el funcionamiento de la pantalla
     def add_address(self):
         self.markers_list.append(self.search_marker)
@@ -150,7 +149,7 @@ class ClientesScreen(Screen):
         self.ids.mapa.center_on(lat, lng)
         self.ids.mapa.zoom=17
         if self.search_marker is None:
-            marker=DomicilioMarker(lat=lat,lon=lng,detalles_domicilio={'domicilio':details})
+            marker=DomicilioMarker(lat=lat,lon=lng,detalles_domicilio=details)
             self.search_marker=marker
             self.ids.mapa.add_marker(self.search_marker)
         else:
@@ -252,7 +251,7 @@ class ClientesScreen(Screen):
             else:
                 for i in domicilio:
                     print(i)
-                    address=DomicilioMarker(lat=i['lat'], lon=i['lon'],detalles_domicilio={'domicilio':i['descripcion']})
+                    address=DomicilioMarker(lat=i['lat'], lon=i['lon'],detalles_domicilio=i['descripcion'])
                     self.markers_list.append(address)
                     print(address.lat,address.lon)
                 self.set_markers(self.markers_list)
@@ -277,9 +276,17 @@ class ClientesScreen(Screen):
         if not len(self.markers_list)==0:
             for i in self.markers_list:
                 address={}
-                address['descripcion']=i.detalles_domicilio['domicilio']
+                address['descripcion']=i.detalles_domicilio
                 address['lat']=i.lat
                 address['lon']=i.lon
                 addresses.append(address)
         data['domicilio']=addresses
         return data
+
+    def delete_address(self,marker):
+        marker.menu.dismiss()
+        self.ids.mapa.remove_marker(marker)
+        self.markers_list.remove(marker)
+        MDSnackbar(MDLabel(text='Domicilio eliminado (No olvides guardar los cambios)',theme_text_color="Custom",
+                text_color="#ffffff",)).open()
+        self.set_state("edit")

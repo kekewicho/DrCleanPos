@@ -8,15 +8,17 @@ from utils import (
     MDLabel,
     Thread,
     date,
-    pd
+    pd,
+    ak
 )
 
 from Widgets.widgets import ActivosCard
 
 class ActivosScreen(Screen):
     servicios=[]
-    def set_cards(self,data:pd.DataFrame()):
+    def set_cards(self,data):
         for key,value in data.iterrows():
+            value['fecha']=value['fecha'].strftime('%Y-%m-%d')
             self.add_card(value)
 
     def selector(self,pos,selected):
@@ -24,20 +26,21 @@ class ActivosScreen(Screen):
         anim.start(self.ids.selector)
         Thread(target=self.setSelector(selected)).start()
 
-    @mainthread
     def add_card(self,data):
-        card=ActivosCard(
-            idNota=data['index'],
-            userName=data['usuario_name'],
-            status=data['status'],
-            fecha=data['fecha'],
-            aDomicilio=data['a domicilio'],
-            total=data['total'],
-            saldo=data['saldo']
-            )
-        card.ids.statusIcon.on_release=lambda x=card:self.updateStatus(x)
-        self.ids.activos_layout.add_widget(card)
-        self.servicios.append(card)
+        async def add_card():
+            card=ActivosCard(
+                idNota=data['index'],
+                userName=data['usuario_name'],
+                status=data['status'],
+                fecha=data['fecha'],
+                aDomicilio=data['a domicilio'],
+                total=data['total'],
+                saldo=data['saldo']
+                )
+            card.ids.statusIcon.on_release=lambda x=card:self.updateStatus(x)
+            self.ids.activos_layout.add_widget(card)
+            self.servicios.append(card)
+        ak.start(add_card())
     
     def updateStatus(self,card:ActivosCard):
         status=card.status
@@ -53,15 +56,16 @@ class ActivosScreen(Screen):
         card.setStatus(new_status)
         MDSnackbar(MDLabel(text='Estatus de servicio actualizado'),MDFlatButton(text='DESHACER',on_release=lambda x=card,old=status:x.setStatus(old))).open()
 
-    @mainthread
     def setSelector(self,selected):
-        self.ids.activos_layout.clear_widgets()
-        if selected=='Todo':
-            for i in self.servicios:self.ids.activos_layout.add_widget(i)
-        if selected in ['entrega','sucursal','recoleccion']:
-            for i in self.servicios:
-                if i.status==selected:self.ids.activos_layout.add_widget(i)
-        if selected=='Rezagado':
-            for i in self.servicios:
-                if (pd.Timestamp.now()-pd.to_datetime(i.fecha)).days>=14:
-                    self.ids.activos_layout.add_widget(i)
+        async def setSelector():
+            self.ids.activos_layout.clear_widgets()
+            if selected=='Todo':
+                for i in self.servicios:self.ids.activos_layout.add_widget(i)
+            if selected in ['entrega','sucursal','recoleccion']:
+                for i in self.servicios:
+                    if i.status==selected:self.ids.activos_layout.add_widget(i)
+            if selected=='Rezagado':
+                for i in self.servicios:
+                    if (pd.Timestamp.now()-pd.to_datetime(i.fecha)).days>=14:
+                        self.ids.activos_layout.add_widget(i)
+        ak.start(setSelector())
