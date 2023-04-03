@@ -1,13 +1,10 @@
 from utils import (
     Screen,
     Animation,
-    mainthread,
     bd,
     MDSnackbar,
     MDFlatButton,
     MDLabel,
-    Thread,
-    date,
     pd,
     ak
 )
@@ -24,7 +21,7 @@ class ActivosScreen(Screen):
     def selector(self,pos,selected):
         anim=Animation(size_hint=(0,0),duration=.1)+Animation(pos_hint={'center_x':pos},duration=.05)+Animation(size_hint=(.185,.8),duration=.2)
         anim.start(self.ids.selector)
-        Thread(target=self.setSelector(selected)).start()
+        target=self.setSelector(selected)
 
     def add_card(self,data):
         async def add_card():

@@ -4,12 +4,9 @@ from utils import (
     Screen,
     MDDataTable,
     date,
-    datetime,
     bd,
     dp,
-    mainthread,
     pd,
-    Thread,
     ak
 )
 

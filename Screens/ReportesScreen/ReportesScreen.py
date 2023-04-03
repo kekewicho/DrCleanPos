@@ -5,8 +5,6 @@ from utils import (
     bd,
     plt,
     ticker,
-    mainthread,
-    Thread,
     ak
 )
 

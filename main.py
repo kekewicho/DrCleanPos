@@ -15,7 +15,6 @@ from Screens.VentaScreen.VentaScreen import VentaScreen
 #Demás utilidades para el inicio de la app
 from utils import (
     MDApp,
-    Thread,
     os,
     LabelBase
 )

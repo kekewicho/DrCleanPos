@@ -9,7 +9,6 @@ from kivymd.uix.snackbar import MDSnackbar
 from kivymd.uix.label import MDLabel,MDIcon
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.garden.mapview.mapview.view import MapMarkerPopup
-from kivy.clock import mainthread
 from kivy.lang import Builder
 from kivymd.uix.pickers import MDDatePicker
 from kivymd.uix.datatables import MDDataTable
@@ -17,7 +16,6 @@ from datetime import datetime, date
 from database import bd,clientes,notas,lista_precios
 from kivy.metrics import dp
 import pandas as pd
-from threading import Thread
 from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker

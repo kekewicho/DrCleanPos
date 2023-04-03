@@ -9,10 +9,7 @@ from utils import (
     MDSnackbar,
     MDLabel,
     MDBoxLayout,
-    MapMarkerPopup,
-    mainthread,
     clientes,
-    Thread,
     MDIconButton,
     ak
 )
@@ -108,7 +105,7 @@ class ClientesScreen(Screen):
         self.clean()
         self.ids.clientes_manager.current='lista_clientes'
         self.ids.clientes_list.clear_widgets()
-        Thread(target=self.get_clientes()).start()
+        self.get_clientes()
 
 
     def eliminar(self):
@@ -119,7 +116,7 @@ class ClientesScreen(Screen):
                 text_color="#ffffff",)).open()
         self.ids.clientes_manager.current="lista_clientes"
         self.ids.clientes_list.clear_widgets()
-        Thread(target=self.get_clientes()).start()
+        target=self.get_clientes()
     
     def define_ubi(self,id,details):
         global api_key,url
