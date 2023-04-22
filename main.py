@@ -16,8 +16,11 @@ from Screens.VentaScreen.VentaScreen import VentaScreen
 from utils import (
     MDApp,
     os,
-    LabelBase
+    LabelBase,
+    dp
 )
+
+
 
 class DrCleanPOS(MDApp):
     def build(self):

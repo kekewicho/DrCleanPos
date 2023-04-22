@@ -31,11 +31,13 @@ class ReportesScreen(Screen):
         async def render_plot_ventasmes():
             df=ventas
             df['fecha'] = pd.to_datetime(df['fecha'])
-            df['mes'] = df['fecha'].dt.month
-            df['mes']=df['mes'].apply(self.get_month_name)
+            df['mesnumero'] = df['fecha'].dt.month
+            df['mes']=df['mesnumero'].apply(self.get_month_name)
             df=df[df['fecha'].dt.year==pd.Timestamp.now().year]
-            df=ventas[['mes','total','fecha']]
-            ventas_por_mes = df.groupby('mes').sum()
+            df=df[['mesnumero','total']]
+            ventas_por_mes = df.groupby('mesnumero').sum()
+            ventas_por_mes = ventas_por_mes.sort_values('mesnumero')
+            print(ventas_por_mes)
 
             # Crea el gráfico
             fig, ax = plt.subplots()
@@ -57,24 +59,21 @@ class ReportesScreen(Screen):
             
             self.ids.graph_ventas.add_widget(canvas)
             
-            kpis_data=ventas['total'][df['fecha'].dt.month==pd.Timestamp.now().month]
-            kpis_data_ant=ventas['total'][df['fecha'].dt.month==pd.Timestamp.now().month-1]
+            kpis_data=df['total'][df['mesnumero']==pd.Timestamp.now().month]
+            kpis_data_ant=df['total'][df['mesnumero']==pd.Timestamp.now().month-1]
             if kpis_data.shape[0]==0: return None
             #KPI monto
             self.ids.kpis_monto.text='${:,.2f}'.format(kpis_data.sum())
-            dif=float(kpis_data.sum()/kpis_data_ant.sum())
-            comparativo="+" if int(dif)>0 else "-"
-            self.ids.kpis_monto_comparacion.text=f"{comparativo}{'{:.1f}%'.format((dif*100)%1)} que el mes anterior"
+            dif=float((kpis_data.sum()-kpis_data_ant.sum())/kpis_data.sum())*100
+            self.ids.kpis_monto_comparacion.text=f"{'{:.1f}%'.format(dif)} que el mes anterior"
 
             #KPI cantidad
             self.ids.kpis_cantidad.text=str(kpis_data.shape[0])
-            dif=float(kpis_data.shape[0]/kpis_data_ant.shape[0])
-            comparativo="+" if int(dif)>0 else "-"
-            self.ids.kpis_cantidad_comparacion.text=f"{comparativo}{'{:.1f}%'.format((dif*100)%1)} que el mes anterior"
+            dif=float((kpis_data.shape[0]-kpis_data_ant.shape[0])/kpis_data.shape[0])*100
+            self.ids.kpis_cantidad_comparacion.text=f"{'{:.1f}%'.format(dif)} que el mes anterior"
             
             #KPI ticket promedio
             self.ids.kpis_monto.text='${:,.2f}'.format(kpis_data.mean())
-            dif=float(kpis_data.mean()/kpis_data_ant.mean())
-            comparativo="+" if int(dif)>0 else "-"
-            self.ids.kpis_monto_comparacion.text=f"{comparativo}{'{:.1f}%'.format((dif*100)%1)} que el mes anterior"
+            dif=float((kpis_data.mean()-kpis_data_ant.mean())/kpis_data.mean())*100
+            self.ids.kpis_monto_comparacion.text=f"{'{:.1f}%'.format(dif)} que el mes anterior"
         ak.start(render_plot_ventasmes())

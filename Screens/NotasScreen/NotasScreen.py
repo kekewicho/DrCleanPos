@@ -48,8 +48,9 @@ class NotasScreen(Screen):
             self.notas=self.normalize_data(self.notas)
             self.notas['fecha'] = self.notas['fecha'].astype(str)
 
-            self.manager.get_screen('Reportes_Screen').render_plot_ventasmes(self.notas)
-            self.manager.get_screen('Activos_Screen').set_cards(self.notas[self.notas['status']!='finalizado'])
+            if self.dataTable is None:
+                self.manager.get_screen('Reportes_Screen').render_plot_ventasmes(self.notas)
+                self.manager.get_screen('Activos_Screen').set_cards(self.notas[self.notas['status']!='finalizado'])
 
             data_ventas=self.notas[['usuario_name','fecha','a domicilio','total','saldo','index']]   
             row_data = self.df_to_datatable(data_ventas)

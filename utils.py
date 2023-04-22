@@ -8,7 +8,6 @@ from kivymd.uix.button import MDRaisedButton, MDIconButton, MDFlatButton
 from kivymd.uix.snackbar import MDSnackbar
 from kivymd.uix.label import MDLabel,MDIcon
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivy.garden.mapview.mapview.view import MapMarkerPopup
 from kivy.lang import Builder
 from kivymd.uix.pickers import MDDatePicker
 from kivymd.uix.datatables import MDDataTable
@@ -30,6 +29,9 @@ import matplotlib
 from kivymd.utils import asynckivy as ak
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.core.clipboard import Clipboard
+from kivy.config import Config
+from kivy_garden.mapview import MapMarkerPopup
+Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
 
 def get_app():

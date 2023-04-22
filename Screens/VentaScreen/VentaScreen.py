@@ -17,7 +17,9 @@ from utils import (
     lista_precios,
     clientes,
     ak,
-    MDSeparator
+    MDSeparator,
+    MDApp,
+    dp
 )
 from Widgets.widgets import BtnServicio
 
@@ -33,7 +35,12 @@ class UserItem(MDCard):
     pass
 
 class ServiceItem(MDCardSwipe):
-    pass
+    def __init__(self, cantidad, servicio,*args):
+        super().__init__(*args)
+        self.ids.cantidad.text=str(cantidad)
+        self.ids.servicio.text=servicio
+        self.ids.precio.text="${:,.2f}".format(lista_precios.get(servicio.replace(' / ','-')))
+        print(self.children,self.ids)
 
 class ContentUser(MDBoxLayout):
     pass
@@ -163,10 +170,7 @@ class VentaScreen(Screen):
 
     def add_service(self,service,cant=1):
         if service=='ROPA PARA LAV/KG':
-            item=ServiceItem()
-            item.ids.cantidad.text='{:,.1f}'.format(cant)
-            item.ids.servicio.text=service
-            item.ids.precio.text="${:,.2f}".format(lista_precios.get(service.replace('/','-')))
+            item=ServiceItem(cant,'ROPA PARA LAV / KG')
             self.ids.articulos_nota.add_widget(item,len(self.ids.articulos_nota.children))
             self.update_sub()
             return None
@@ -176,10 +180,7 @@ class VentaScreen(Screen):
                 i.ids.cantidad.text=str(eval(i.ids.cantidad.text)+1)
                 self.update_sub()
                 return None
-        item=ServiceItem()
-        item.ids.cantidad.text=str(cant)
-        item.ids.servicio.text=service
-        item.ids.precio.text="${:,.2f}".format(lista_precios.get(service.replace(' / ','-')))
+        item=ServiceItem(cant,service)
         self.ids.articulos_nota.add_widget(item,len(self.ids.articulos_nota.children))
         self.update_sub()
 
@@ -242,6 +243,7 @@ class VentaScreen(Screen):
 
     def venta(self,abono=0):
         async def venta():
+            await ak.sleep(0)
             global selected_client,fecha,idActual
             if selected_client=='':
                 MDSnackbar(MDLabel(text='No has selecionado ningun usuario',theme_text_color="Custom",
@@ -278,9 +280,10 @@ class VentaScreen(Screen):
             data['articulos']=articulos
             if idActual==None:
                 id_nota=bd.child('notas').push(data)
-                data=self.manager.get_screen('Notas_Screen').normalize_data(data)
                 data['index']=id_nota['name']
+                data=self.manager.get_screen('Notas_Screen').normalize_data(data)
                 self.manager.get_screen('Activos_Screen').add_card(data)
+                self.manager.get_screen('Notas_Screen').load_data()
                 MDSnackbar(MDLabel(text='Venta realizada con éxito',theme_text_color="Custom",
                     text_color="#ffffff",)).open()
             if idActual!=None:
@@ -288,6 +291,7 @@ class VentaScreen(Screen):
                 MDSnackbar(MDLabel(text='Nota actualizada con éxito',theme_text_color="Custom",
                     text_color="#ffffff",)).open()
             self.clean()
+            MDApp.get_running_app().root.loading()
         ak.start(venta())
 
     

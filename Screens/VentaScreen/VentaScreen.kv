@@ -1,10 +1,10 @@
 <ButtonClean>:
     size_hint_x:None
-    width:50
+    width:"50dp"
     on_release:app.root.ids.main_manager.get_screen('Venta_Screen').clean()
     md_bg_color:'#aa0000'
-    elevation:1
-    radius:10
+    elevation:dp(1)
+    radius:"10dp"
     MDAnchorLayout:
         anchor_x:'center'
         anchor_y:'center'
@@ -16,8 +16,8 @@
 <UserItem>:
     size_hint_y: None
     height: '100sp'
-    padding:10
-    spacing:5
+    padding:"10dp"
+    spacing:"5dp"
     ripple_behavior: True
     focus_behavior: True
     on_release:app.root.ids.main_manager.get_screen('Venta_Screen').define_user(nombre.text,userid.text)
@@ -28,7 +28,7 @@
         MDIcon:
             icon:'account'
     MDBoxLayout:
-        spacing:5
+        spacing:"5dp"
         orientation:'vertical'
         MDLabel:
             bold:True
@@ -48,7 +48,7 @@
 <ServiceItem>:
     size_hint_y: None
     height: '55sp'
-    radius:1
+    radius:"2dp"
     MDCardSwipeLayerBox:
         MDAnchorLayout:
             anchor_x:'left'
@@ -101,7 +101,7 @@
 <ContentUser>:
     orientation:'vertical'
     size_hint_y:None
-    height:200
+    height:"200dp"
     MDBoxLayout:
         size_hint_y:None
         height:self.minimum_height
@@ -116,7 +116,7 @@
         MDAnchorLayout:
             anchor_x:'center'
             anchor_y:'top'
-            padding:5
+            padding:"5dp"
             MDTextButton:
                 text: "+ Nuevo usuario"
                 theme_text_color: "Custom"
@@ -128,33 +128,34 @@
     name:'Venta_Screen'
     MDBoxLayout:
         ScrollView:
+            scroll_wheel_distance:dp(50)
             MDStackLayout:
                 adaptive_height:True
-                padding:15
-                spacing:20
+                padding:"15dp"
+                spacing:"20dp"
                 id:servicios
         MDBoxLayout:
             orientation:'vertical'
             size_hint_x:None
             width:'350dp'
-            padding:10
+            padding:"10dp"
             MDGridLayout:
                 cols:1
                 height:self.minimum_height
-                spacing:15
+                spacing:"15dp"
                 MDBoxLayout:
                     id:user_area
                     size_hint_y:None
                     height:self.minimum_height
-                    spacing:10
+                    spacing:"10dp"
                     MDCard:
                         id:user_card
-                        elevation:1
-                        radius:10
+                        elevation:dp(1)
+                        radius:"10dp"
                         size_hint_y:None
-                        height:50
-                        padding:10
-                        spacing:10
+                        height:"50dp"
+                        padding:"10dp"
+                        spacing:"10dp"
                         ripple_behavior: True
                         md_bg_color:'#dadada'
                         on_release: root.user_define()
@@ -177,16 +178,16 @@
                                 theme_text_color: "Custom"
                                 text_color: "#8d8d8d"
                 MDBoxLayout:
-                    spacing:10
+                    spacing:"10dp"
                     size_hint_y:None
                     height:self.minimum_height
                     MDCard:
-                        padding:10
-                        spacing:10
+                        padding:"10dp"
+                        spacing:"10dp"
                         size_hint_y:None
-                        elevation:1
-                        height:30
-                        radius:10
+                        elevation:dp(1)
+                        height:"30dp"
+                        radius:"10dp"
                         md_bg_color:'#dadada'
                         MDLabel:
                             text:'A domicilio'
@@ -199,12 +200,12 @@
                             width:self.parent.height
                             id:check_envio
                     MDCard:
-                        padding:10
-                        spacing:10
+                        padding:"10dp"
+                        spacing:"10dp"
                         size_hint_y:None
-                        elevation:1
-                        height:30
-                        radius:10
+                        elevation:dp(1)
+                        height:"30dp"
+                        radius:"10dp"
                         md_bg_color:'#dadada'
                         MDLabel:
                             text:'Promociones'
@@ -218,13 +219,13 @@
                             id:check_descuento
                             active:True
                     MDCard:
-                        padding:10
-                        spacing:10
+                        padding:"10dp"
+                        spacing:"10dp"
                         size_hint:None,None
-                        width:50
-                        elevation:1
-                        height:30
-                        radius:10
+                        width:"50dp"
+                        elevation:dp(1)
+                        height:"30dp"
+                        radius:"10dp"
                         md_bg_color:'#dadada'
                         ripple_behavior: True
                         on_release:root.show_date_picker()
@@ -237,9 +238,27 @@
                                 theme_text_color: "Custom"
                                 text_color: "#8d8d8d"
                                 id:date_selector_icon
-                ScrollView:
-                    MDList:
-                        id:articulos_nota
+                MDRelativeLayout:
+                    radius:"10dp"
+                    md_bg_color:"#f2f2f2" if len(articulos_nota.children)==0 else (0,0,0,0)
+                    ScrollView:
+                        scroll_wheel_distance:dp(50)
+                        pos_hint:{'center_x':.5}
+                        size_hint_y:1
+                        MDList:
+                            id:articulos_nota
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        md_bg_color:(0,0,0,0)
+                        MDLabel:
+                            adaptive_height:True
+                            text:"Sin artículos" if len(articulos_nota.children)==0 else ""
+                            font_name:'Regular'
+                            font_size:"15sp"
+                            halign:'center'
+                            theme_text_color: "Custom"
+                            text_color: (0,0,0,.4)
                 MDBoxLayout:
                     orientation:'vertical'
                     height:self.minimum_height
@@ -301,35 +320,17 @@
                             font_name:'Regular'
                             text:'$0.00'
                             halign:'right'
-                    MDBoxLayout:
-                        size_hint_y:None
-                        height:self.minimum_height
-                        MDLabel:
-                            bold:True
-                            font_size:'25sp'
-                            text:'Saldo:'
-                            halign:'right'
-                            adaptive_height:True
-                            font_name:'Regular'
-                        MDLabel:
-                            id:saldo
-                            size_hint_x:.7
-                            font_name:'Regular'
-                            text:'$0.00'
-                            halign:'right'
-                            font_size:'25sp'
-                            bold:True
                 MDRelativeLayout:
                     md_bg_color:"#dadada"
-                    radius:10
+                    radius:"10dp"
                     size_hint:1,None
-                    height:40
+                    height:"40dp"
                     MDFloatLayout:
                         id:selector
                         size_hint:.30,.8
                         pos_hint:{'center_x':1/6,'center_y':.5}
                         md_bg_color:1,1,1,1
-                        radius:10
+                        radius:"10dp"
                     MDBoxLayout:
                         selected:1
                         MDAnchorLayout:
@@ -368,12 +369,30 @@
                                     self.active=True
                                 font_name:'Regular'
                                 active:False
-                MDRaisedButton:
+                MDCard:
                     size_hint_x:1
-                    text:'[b]GUARDAR[b]'
                     md_bg_color:'#089cba'
-                    font_name:'Regular'
+                    size_hint_y:None
+                    height:"36dp"
+                    radius:"10dp"
+                    padding:"15dp"
                     on_release:
+                        app.root.loading()
                         if s_abono.active:root.venta()
                         if c_abono.active:root.abono()
                         if pago_total.active:root.venta(-1)
+                    MDLabel:
+                        font_name:'Bold'
+                        text:'GUARDAR'
+                        halign:'left'
+                        font_size:'15sp'
+                        theme_text_color: "Custom"
+                        text_color: (1,1,1,1)
+                    MDLabel:
+                        id:saldo
+                        font_name:'Bold'
+                        text:'$0.00'
+                        halign:'right'
+                        font_size:'15sp'
+                        theme_text_color: "Custom"
+                        text_color: (1,1,1,1)
