@@ -30,7 +30,7 @@ class ReportesScreen(Screen):
     def render_plot_ventasmes(self,ventas:pd.DataFrame):
         async def render_plot_ventasmes():
             df=ventas
-            df['fecha'] = pd.to_datetime(df['fecha'])
+            df['fecha'] = pd.to_datetime(df['fecha'],format='%Y-%m-%d %H:%M')
             df['mesnumero'] = df['fecha'].dt.month
             df['mes']=df['mesnumero'].apply(self.get_month_name)
             df=df[df['fecha'].dt.year==pd.Timestamp.now().year]

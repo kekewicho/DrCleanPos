@@ -15,7 +15,7 @@ class ActivosScreen(Screen):
     servicios=[]
     def set_cards(self,data):
         for key,value in data.iterrows():
-            value['fecha']=value['fecha'].strftime('%Y-%m-%d')
+            value['fecha']=value['fecha'].strftime('%Y-%m-%d %H:%M')
             self.add_card(value)
 
     def selector(self,pos,selected):

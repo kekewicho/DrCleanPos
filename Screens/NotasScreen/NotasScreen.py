@@ -46,12 +46,13 @@ class NotasScreen(Screen):
             self.notas=pd.DataFrame(data.val(),index=None).transpose()
             self.notas=self.notas.reset_index(drop=False)
             self.notas=self.normalize_data(self.notas)
-            self.notas['fecha'] = self.notas['fecha'].astype(str)
 
             if self.dataTable is None:
                 self.manager.get_screen('Reportes_Screen').render_plot_ventasmes(self.notas)
                 self.manager.get_screen('Activos_Screen').set_cards(self.notas[self.notas['status']!='finalizado'])
 
+            self.notas['fecha'] = self.notas['fecha'].dt.date
+            self.notas['fecha'] = self.notas['fecha'].astype(str)
             data_ventas=self.notas[['usuario_name','fecha','a domicilio','total','saldo','index']]   
             row_data = self.df_to_datatable(data_ventas)
             if self.dataTable is None:
