@@ -26,14 +26,23 @@ class ActivosScreen(Screen):
     def add_card(self,data):
         async def add_card():
             await ak.sleep(0)
-            card=ActivosCard(
-                idNota=data['index'],
-                userName=data['usuario_name'],
-                status=data['status'],
-                fecha=data['fecha'],
-                aDomicilio=data['a domicilio'],
-                total=data.get('total'),
-                saldo=data.get('saldo')
+            if data.get('total') is None:
+                card=ActivosCard(
+                    idNota=data['index'],
+                    userName=data['usuario_name'],
+                    status=data['status'],
+                    fecha=data['fecha'],
+                    aDomicilio=data['a domicilio'],
+                    )
+            else:
+                card=ActivosCard(
+                    idNota=data['index'],
+                    userName=data['usuario_name'],
+                    status=data['status'],
+                    fecha=data['fecha'],
+                    aDomicilio=data['a domicilio'],
+                    total=data['total'],
+                    saldo=data['saldo']
                 )
             card.ids.statusIcon.on_release=lambda x=card:self.updateStatus(x)
             self.ids.activos_layout.add_widget(card)

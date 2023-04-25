@@ -56,7 +56,7 @@ class ActivosCard(MDCard):
 
         self.setStatus(status)
         self.ids.user_name.text=userName
-        self.ids.aDomicilio.text='En sucursal' if aDomicilio else 'A domicilio'
+        self.ids.aDomicilio.text='A domicilio' if aDomicilio else 'En sucursal'
         self.ids.fecha.text=fecha
 
         if total==0.00:
