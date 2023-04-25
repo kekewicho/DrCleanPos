@@ -48,7 +48,7 @@ class ActivosCard(MDCard):
     }
 
     def __init__(self,idNota:str,userName:str,status:str,fecha,aDomicilio:bool,total:float=0.00,saldo:float=0.00,*args,):
-        super().__init__(*args,)
+        super().__init__(*args)
         self.id_nota=idNota
         self.status=status
         self.aDomicilio=aDomicilio

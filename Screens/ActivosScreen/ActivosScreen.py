@@ -31,8 +31,8 @@ class ActivosScreen(Screen):
                 status=data['status'],
                 fecha=data['fecha'],
                 aDomicilio=data['a domicilio'],
-                total=data['total'],
-                saldo=data['saldo']
+                total=data.get('total'),
+                saldo=data.get('saldo')
                 )
             card.ids.statusIcon.on_release=lambda x=card:self.updateStatus(x)
             self.ids.activos_layout.add_widget(card)
@@ -66,3 +66,13 @@ class ActivosScreen(Screen):
                     if (pd.Timestamp.now()-pd.to_datetime(i.fecha)).days>=14:
                         self.ids.activos_layout.add_widget(i)
         ak.start(setSelector())
+    
+    def eventListener(self,message):
+        async def eventListener():
+            if message['event']=='patch':
+                data={}
+                for key,value in message['data'].items():
+                    data=value
+                    data['index']=key
+                self.add_card(data)
+        ak.start(eventListener())

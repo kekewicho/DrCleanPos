@@ -20,16 +20,18 @@ from utils import (
     dp
 )
 
-
-
 class DrCleanPOS(MDApp):
     def build(self):
         return MainScreen()
     
     def on_start(self):
+        self.root.startStreaming()
         self.root.ids.main_manager.get_screen('Venta_Screen').load_services()
         self.root.ids.main_manager.get_screen('Notas_Screen').load_data()
         self.root.ids.main_manager.get_screen('Clientes_Screen').get_clientes()
+    
+    def on_stop(self):
+        self.root.dataStream.close()
 
 if __name__=='__main__':
     for i in os.listdir('Assets/fonts'):
