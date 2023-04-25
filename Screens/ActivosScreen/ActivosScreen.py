@@ -25,6 +25,7 @@ class ActivosScreen(Screen):
 
     def add_card(self,data):
         async def add_card():
+            await ak.sleep(0)
             card=ActivosCard(
                 idNota=data['index'],
                 userName=data['usuario_name'],
