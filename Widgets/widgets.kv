@@ -64,11 +64,16 @@
             id:fecha
             adaptive_height:True
     MDSeparator:
+    MDBoxLayout:
+        id:content
 
 <ContentNoCargada>:
     spacing:10
-    MDIcon:
-        icon:'clock'
+    MDAnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'center'
+        MDIcon:
+            icon:'clock'
     MDLabel:
         text:'Nota pendiente de carga'
         font_name:'Regular'

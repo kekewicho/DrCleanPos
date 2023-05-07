@@ -60,10 +60,10 @@ class ActivosCard(MDCard):
         self.ids.fecha.text=fecha
 
         if total==0.00:
-            self.add_widget(ContentNoCargada())
+            self.ids.content.add_widget(ContentNoCargada())
         else:
             self.content=ContentCargada(total=total,saldo=saldo)
-            self.add_widget(
+            self.ids.content.add_widget(
                 self.content
             )
 
@@ -72,6 +72,13 @@ class ActivosCard(MDCard):
         self.ids.statusIcon.md_bg_color=config['color']
         self.ids.statusIcon.icon=config['icon']
         self.status=status
+    
+    def switchContent(self,total,saldo):
+        self.ids.content.clear_widgets()
+        self.content=ContentCargada(total=total,saldo=saldo)
+        self.ids.content.add_widget(
+                self.content
+            )
 
 class ContentCargada(MDBoxLayout):
     total=NumericProperty()

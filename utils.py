@@ -31,8 +31,46 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivy.core.clipboard import Clipboard
 from kivy.config import Config
 from kivy_garden.mapview import MapMarkerPopup
+from PIL import Image, ImageDraw, ImageFont
+
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
 
 def get_app():
     return MDApp.get_running_app()
+
+
+def generateNota(data):
+    imgBase = Image.open('assets/images/NOTA_ELECTRONICA.png')
+
+    # Agregar texto a la imagen
+    draw = ImageDraw.Draw(imgBase)
+    fontNombre = ImageFont.truetype("Assets\\fonts\\Lato-Regular.ttf", 39)
+    fontM = ImageFont.truetype("Assets\\fonts\\Lato-Regular.ttf", 23,)
+    fontB = ImageFont.truetype("Assets\\fonts\\Lato-Bold.ttf", 25,)
+    draw.text((85,274), data['usuario_name'], fill=(0, 0, 0), font=fontNombre)
+    draw.text((306, 326), data['fecha'], fill=(0, 0, 0), font=fontM)
+    draw.text((151, 359), data['index'], fill=(187, 0, 4), font=fontM)
+
+    # Agregar tabla de servicios
+    y = 495
+    for articulo in data['articulos']:
+        draw.text((68, y), '{:.1f}'.format(articulo['cantidad']), fill=(0, 0, 0), font=fontM)
+        draw.text((214, y), '${:,.2f}'.format(articulo['precio']), fill=(0, 0, 0), font=fontM)
+        draw.text((351, y), articulo['servicio'], fill=(0, 0, 0), font=fontM)
+        draw.text((739, y), '${:,.2f}'.format(articulo['cantidad']*articulo['precio']), fill=(0, 0, 0), font=fontM)
+
+        y += 35
+    
+    draw.text((536, y+68), "SUBTOTAL", fill=(0, 0, 0), font=fontM)
+    draw.text((692, y+68), '${:,.2f}'.format(data['subtotal']), fill=(0, 0, 0), font=fontM)
+    draw.text((587, y+107), "ENVÍO", fill=(0, 0, 0), font=fontM)
+    draw.text((692, y+107), '${:,.2f}'.format(data['envio']), fill=(0, 0, 0), font=fontM)
+    draw.text((509, y+146), "DESCUENTOS", fill=(0, 0, 0), font=fontM)
+    draw.text((692, y+146), '${:,.2f}'.format(data['descuentos']), fill=(0, 0, 0), font=fontM)
+    draw.text((470, y+186), "TOTAL A PAGAR", fill=(0, 0, 0), font=fontB)
+    draw.text((692, y+186), '${:,.2f}'.format(data['total']), fill=(0, 0, 0), font=fontB)
+
+
+    # Guardar imagen
+    imgBase.save(f"C:\\Users\\kekew\\Desktop\\{data['usuario_name']}.png")

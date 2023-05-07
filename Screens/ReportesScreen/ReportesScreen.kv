@@ -2,25 +2,26 @@
     name:'Reportes_Screen'
     MDBoxLayout:
         orientation:'vertical'
-        spacing:15
-        padding:15
+        spacing:"15dp"
+        padding:"15dp"
         ScrollView:
             do_scroll_x: True
             do_scroll_y: False
             size_hint_y:None
             height:'170dp'
             MDGridLayout:
-                padding:15
+                padding:"15dp"
                 rows:1
-                spacing:15
+                spacing:"15dp"
                 adaptive_width:True
                 width:self.minimum_width
                 MDCard:
-                    spacing:10
+                    spacing:"10dp"
                     elevation:1
                     size_hint:None,None
                     height:'150dp'
                     width:'350dp'
+                    padding:'10dp'
                     MDAnchorLayout:
                         anchor_x:'center'
                         anchor_y:'center'
@@ -35,7 +36,7 @@
                         anchor_y:'center'
                         MDBoxLayout:
                             orientation:'vertical'
-                            spacing:5
+                            spacing:"5dp"
                             size_hint_y:None
                             height:self.minimum_height
                             MDLabel:
@@ -58,11 +59,12 @@
                                 theme_text_color: "Custom"
                                 text_color: "#8d8d8d"
                 MDCard:
-                    spacing:10
+                    spacing:"10dp"
                     elevation:1
                     size_hint:None,None
                     height:'150dp'
                     width:'350dp'
+                    padding:'10dp'
                     MDAnchorLayout:
                         anchor_x:'center'
                         anchor_y:'center'
@@ -77,7 +79,7 @@
                         anchor_y:'center'
                         MDBoxLayout:
                             orientation:'vertical'
-                            spacing:5
+                            spacing:"5dp"
                             size_hint_y:None
                             height:self.minimum_height
                             MDLabel:
@@ -100,11 +102,12 @@
                                 theme_text_color: "Custom"
                                 text_color: "#8d8d8d"
                 MDCard:
-                    spacing:10
+                    spacing:"10dp"
                     elevation:1
                     size_hint:None,None
                     height:'150dp'
                     width:'350dp'
+                    padding:'10dp'
                     MDAnchorLayout:
                         anchor_x:'center'
                         anchor_y:'center'
@@ -119,7 +122,7 @@
                         anchor_y:'center'
                         MDBoxLayout:
                             orientation:'vertical'
-                            spacing:5
+                            spacing:"5dp"
                             size_hint_y:None
                             height:self.minimum_height
                             MDLabel:
@@ -143,5 +146,5 @@
                                 text_color: "#8d8d8d"
         MDCard:
             elevation:1
-            padding:10
+            padding:"10dp"
             id:graph_ventas

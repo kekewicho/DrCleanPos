@@ -7,7 +7,9 @@ from utils import (
     bd,
     dp,
     pd,
-    ak
+    ak,
+    generateNota,
+    get_app
 )
 
 class BotonesNotas(MDIconButton):
@@ -96,7 +98,16 @@ class NotasScreen(Screen):
         pass
 
     def eticket(self):
-        pass
+        async def eticket():
+            checked=self.dataTable.get_row_checks()
+            for i in checked:
+                await ak.sleep(0)
+                data=self.notas[self.notas['index']==i[-1]]
+                data=data.to_dict(orient='records')[0]
+                generateNota(data)
+            get_app().root.loading()    
+        get_app().root.loading()
+        ak.start(eticket())
 
     def open_nota(self):
         notaid=self.dataTable.get_row_checks()[0][-1]
@@ -150,3 +161,4 @@ class NotasScreen(Screen):
         self.date_dialog = MDDatePicker()
         self.date_dialog.bind(on_save=self.on_save_ff if field=='ff' else self.on_save_fi, on_cancel=self.on_cancel)
         self.date_dialog.open()
+    

@@ -86,3 +86,16 @@ class ActivosScreen(Screen):
                     data['index']=key
                 self.add_card(data)
         ak.start(eventListener())
+    
+    def updateCard(self,data):
+        async def updateCard():
+            for i in self.servicios:
+                if i.id_nota==data['index']:card=i
+            card.status=data['status']
+            if card.status=='recoleccion':
+                card.switchContent(0,0)
+            
+            card.content.total=data['total']
+            card.content.saldo=data['saldo']
+
+        ak.start(updateCard())

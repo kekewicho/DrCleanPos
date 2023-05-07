@@ -290,6 +290,9 @@ class VentaScreen(Screen):
                 bd.child(f'notas/{idActual}').update(data)
                 MDSnackbar(MDLabel(text='Nota actualizada con éxito',theme_text_color="Custom",
                     text_color="#ffffff",)).open()
+                data['index']=idActual
+                data=self.manager.get_screen('Notas_Screen').normalize_data(data)
+                self.manager.get_screen('Activos_Screen').updateCard(data)
             self.clean()
             MDApp.get_running_app().root.loading()
         ak.start(venta())
