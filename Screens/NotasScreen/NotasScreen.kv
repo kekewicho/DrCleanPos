@@ -1,0 +1,68 @@
+<BotonesNotas>:
+    md_bg_color: "#990000" if self.icon=='delete' else '#089cba'
+    on_release:
+        if self.icon=='open-in-new':app.root.ids.main_manager.get_screen('Notas_Screen').open_nota()
+        if self.icon=='file-image-outline':app.root.ids.main_manager.get_screen('Notas_Screen').eticket()
+        if self.icon=='printer':app.root.ids.main_manager.get_screen('Notas_Screen').printTicket()
+        if self.icon=='delete':app.root.ids.main_manager.get_screen('Notas_Screen').eliminar()
+
+<NotasScreen>:
+    name:'Notas_Screen'
+    MDBoxLayout:
+        orientation:'vertical'
+        padding:10
+        spacing:10
+        MDBoxLayout:
+            size_hint_y:.3
+            padding:10
+            MDBoxLayout:
+                spacing:5
+                orientation:'vertical'
+                MDBoxLayout:
+                    spacing:5
+                    MDLabel:
+                        font_name:'Regular'
+                        font_size:'30sp'
+                        adaptive_height:True
+                        size_hint_y:None
+                        text:'Búsqueda de notas'
+                    MDBoxLayout:
+                        spacing:5
+                        id:layout_btns
+                        size_hint_x:None
+                        width:self.minimum_width
+                MDBoxLayout:
+                    spacing:15
+                    MDTextField:
+                        mode:'round'
+                        hint_text:'ID de nota, Nombre o ID de usuario'
+                        icon_left:'magnify'
+                        on_text_validate:root.search(self.text,fi.text,ff.text)
+                    MDRelativeLayout:
+                        size_hint_x:None
+                        width:'150dp'
+                        MDTextField:
+                            id:fi
+                            mode:'round'
+                            hint_text:'Fecha inicial'
+                            size_hint_x:1
+                        MDIconButton:
+                            icon:'calendar-month'
+                            on_release:root.show_date_picker('fi')
+                            size_hint_x:None
+                            icon_size:'20dp'
+                            pos_hint:{'right':1,'center_y':.25}
+                    MDRelativeLayout:
+                        size_hint_x:None
+                        width:'150dp'
+                        MDTextField:
+                            id:ff
+                            mode:'round'
+                            hint_text:'Fecha final'
+                            size_hint_x:1
+                        MDIconButton:
+                            icon:'calendar-month'
+                            on_release:root.show_date_picker('ff')
+                            size_hint_x:None
+                            icon_size:'20dp'
+                            pos_hint:{'right':1,'center_y':.25}

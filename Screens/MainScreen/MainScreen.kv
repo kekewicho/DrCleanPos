@@ -1,0 +1,95 @@
+#:include Screens/NotasScreen/NotasScreen.kv
+#:include Screens/VentaScreen/VentaScreen.kv
+#:include Screens/ClientesScreen/ClientesScreen.kv
+#:include Screens/ReportesScreen/ReportesScreen.kv
+#:include Screens/ActivosScreen/ActivosScreen.kv
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
+
+<MainScreen>:
+    MDBoxLayout:
+        orientation: "vertical"
+        md_bg_color:1,1,1,1
+        MDBoxLayout:
+            size_hint_y:.1
+            spacing:"20dp"
+            padding:"10dp","5dp","10dp",0
+            MDAnchorLayout:
+                anchor_x:'left'
+                anchor_y:'center'
+                size_hint_x:.1
+                Image:
+                    size_hint_x:.7
+                    source:'Assets\images\logo.png'
+                    pos_hint:{'x':.01,'center_y':.5}
+            MDAnchorLayout:
+                anchor_x:'left'
+                anchor_y:'center'
+                MDLabel:
+                    text:'Dr. Clean Lavandería'
+                    font_name:'Regular'
+                    font_size:sp(30)
+            MDBoxLayout:
+                pos_hint:{'right':.97,'center_y':.5}
+                size_hint_x:.3
+                orientation:'vertical'
+                MDLabel:
+                    text:'Sucursal'
+                    font_size:sp(11)
+                    halign:'right'
+                MDLabel:
+                    text:'Zacatecas'
+                    font_name:'Bold'
+                    font_size:sp(15)
+                    halign:'right'
+        MDBoxLayout:
+            MDNavigationRail:
+                id: rail
+                size_hint_y:.96
+                type:'unselected'
+                md_bg_color:'#dadada'
+                anchor: "center"
+                icon_color_item_normal:"#8d8d8d"
+                icon_color_item_active:"##089CBA"
+                selected_color_background: 1,1,1,1
+                ripple_color_item: 1,1,1,1
+                radius:0,"25dp",0,0
+                width:"64dp"
+                MDNavigationRailItem:
+                    icon:'washing-machine'
+                    text:'Venta'
+                    on_release:main_manager.current='Venta_Screen'
+                MDNavigationRailItem:
+                    icon:'file-find'
+                    text:'Notas'
+                    on_release:main_manager.current='Notas_Screen'
+                MDNavigationRailItem:
+                    icon:'account-multiple'
+                    text:'Clientes'
+                    on_release:main_manager.current='Clientes_Screen'
+                MDNavigationRailItem:
+                    icon:'chart-areaspline'
+                    text:'Reportes'
+                    on_release:main_manager.current='Reportes_Screen'
+                MDNavigationRailItem:
+                    icon:'store-clock'
+                    text:'Activos'
+                    on_release:main_manager.current='Activos_Screen'
+            ScreenManager:
+                id:main_manager
+                size_hint_y:.96
+                transition:SlideTransition()
+                VentaScreen:
+                NotasScreen:
+                ClientesScreen:
+                ReportesScreen:
+                ActivosScreen:
+    MDAnchorLayout:
+        md_bg_color:(0,0,0,.4) if spinner.active else (0,0,0,0)
+        anchor_x:'center'
+        anchor_y:'center'
+        MDSpinner:
+            id:spinner
+            size_hint:None,None
+            height:dp(46)
+            width:dp(46)
+            active:False

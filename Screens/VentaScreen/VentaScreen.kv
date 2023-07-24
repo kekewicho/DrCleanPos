@@ -1,0 +1,398 @@
+<ButtonClean>:
+    size_hint_x:None
+    width:"50dp"
+    on_release:app.root.ids.main_manager.get_screen('Venta_Screen').clean()
+    md_bg_color:'#aa0000'
+    elevation:dp(1)
+    radius:"10dp"
+    MDAnchorLayout:
+        anchor_x:'center'
+        anchor_y:'center'
+        MDIcon:
+            icon:'cancel'
+            theme_text_color: "Custom"
+            text_color: "#ffffff"
+
+<UserItem>:
+    size_hint_y: None
+    height: '100sp'
+    padding:"10dp"
+    spacing:"5dp"
+    ripple_behavior: True
+    focus_behavior: True
+    on_release:app.root.ids.main_manager.get_screen('Venta_Screen').define_user(nombre.text,userid.text)
+    MDAnchorLayout:
+        anchor_x:'center'
+        anchor_y:'center'
+        size_hint_x:None
+        MDIcon:
+            icon:'account'
+    MDBoxLayout:
+        spacing:"5dp"
+        orientation:'vertical'
+        MDLabel:
+            bold:True
+            id:nombre
+            font_size:'15sp'
+        MDLabel:
+            id:domicilio
+            font_size:'12sp'
+        MDLabel:
+            id:telefono
+            font_size:'12sp'
+        MDLabel:
+            id:userid
+            font_size:'10sp'
+
+
+<ServiceItem>:
+    size_hint_y: None
+    height: '55sp'
+    radius:"2dp"
+    MDCardSwipeLayerBox:
+        MDAnchorLayout:
+            anchor_x:'left'
+            anchor_y:'center'
+            MDIconButton:
+                icon:'delete'
+                theme_icon_color: "Custom"
+                icon_color: '#990000'
+                on_release:
+                    root.parent.remove_widget(root)
+                    app.root.ids.main_manager.get_screen('Venta_Screen').update_sub()
+    MDCardSwipeFrontBox:
+        MDCard:
+            ripple_behavior:True
+            on_release:root.open_card() if root.state=='closed' else root.close_card()
+            focus_behavior: True
+            radius:0
+            MDLabel:
+                text:'1'
+                id:cantidad
+                bold:True
+                size_hint_x:.2
+                halign:'center'
+                font_name:'Regular'
+                font_size:'22sp'
+            MDLabel:
+                text:'x'
+                size_hint_x:.1
+                halign:'center'
+                font_name:'Regular'
+                font_size:'13sp'
+            MDBoxLayout:
+                orientation:'vertical'
+                MDFloatLayout:
+                MDLabel:
+                    id:servicio
+                    text:'Ropa para lavar/kg'
+                    halign:'left'
+                    font_name:'Regular'
+                    font_size:'18sp'
+                    bold:True
+                    adaptive_height:True
+                MDLabel:
+                    id:precio
+                    font_name:'Regular'
+                    font_size:'13sp'
+                    adaptive_height:True
+                MDFloatLayout:
+
+<ContentUser>:
+    orientation:'vertical'
+    size_hint_y:None
+    height:"200dp"
+    MDBoxLayout:
+        size_hint_y:None
+        height:self.minimum_height
+        id:barra_busqueda
+        MDTextField:
+            id:cliente
+            icon_left: "account-search"
+            hint_text: "Buscar cliente"
+            on_text_validate:app.root.ids.main_manager.get_screen('Venta_Screen').search()
+    ScrollView:
+        id:lista_usuarios
+        MDAnchorLayout:
+            anchor_x:'center'
+            anchor_y:'top'
+            padding:"5dp"
+            MDTextButton:
+                text: "+ Nuevo usuario"
+                theme_text_color: "Custom"
+                text_color: "#089cba"
+                on_release:app.root.ids.main_manager.get_screen('Venta_Screen').switch_newselect()
+
+
+<VentaScreen>:
+    name:'Venta_Screen'
+    MDBoxLayout:
+        ScrollView:
+            scroll_wheel_distance:dp(50)
+            MDStackLayout:
+                adaptive_height:True
+                padding:"15dp"
+                spacing:"20dp"
+                id:servicios
+        MDBoxLayout:
+            orientation:'vertical'
+            size_hint_x:None
+            width:'350dp'
+            padding:"10dp"
+            MDGridLayout:
+                cols:1
+                height:self.minimum_height
+                spacing:"15dp"
+                MDBoxLayout:
+                    id:user_area
+                    size_hint_y:None
+                    height:self.minimum_height
+                    spacing:"10dp"
+                    MDCard:
+                        id:user_card
+                        elevation:dp(1)
+                        radius:"10dp"
+                        size_hint_y:None
+                        height:"50dp"
+                        padding:"10dp"
+                        spacing:"10dp"
+                        ripple_behavior: True
+                        md_bg_color:'#dadada'
+                        on_release: root.user_define()
+                        MDAnchorLayout:
+                            anchor_x:'center'
+                            anchor_y:'center'
+                            size_hint_x:.2
+                            MDIcon:
+                                id:user_icon
+                                icon:'account'
+                                theme_text_color: "Custom"
+                                text_color: "#8d8d8d"
+                        MDAnchorLayout:
+                            anchor_x:'center'
+                            anchor_y:'center'
+                            MDLabel:
+                                id:user
+                                text:'Click para seleccionar usuario'
+                                font_name:'Regular'
+                                theme_text_color: "Custom"
+                                text_color: "#8d8d8d"
+                MDBoxLayout:
+                    spacing:"10dp"
+                    size_hint_y:None
+                    height:self.minimum_height
+                    MDCard:
+                        padding:"10dp"
+                        spacing:"10dp"
+                        size_hint_y:None
+                        elevation:dp(1)
+                        height:"30dp"
+                        radius:"10dp"
+                        md_bg_color:'#dadada'
+                        MDLabel:
+                            text:'A domicilio'
+                            font_name:'Regular'
+                            theme_text_color: "Custom"
+                            text_color: "#8d8d8d"
+                            font_size:'12sp'
+                        MDCheckbox:
+                            size_hint_x:None
+                            width:self.parent.height
+                            id:check_envio
+                    MDCard:
+                        padding:"10dp"
+                        spacing:"10dp"
+                        size_hint_y:None
+                        elevation:dp(1)
+                        height:"30dp"
+                        radius:"10dp"
+                        md_bg_color:'#dadada'
+                        MDLabel:
+                            text:'Promociones'
+                            font_name:'Regular'
+                            theme_text_color: "Custom"
+                            text_color: "#8d8d8d"
+                            font_size:'12sp'
+                        MDCheckbox:
+                            size_hint_x:None
+                            width:self.parent.height
+                            id:check_descuento
+                            active:True
+                    MDCard:
+                        padding:"10dp"
+                        spacing:"10dp"
+                        size_hint:None,None
+                        width:"50dp"
+                        elevation:dp(1)
+                        height:"30dp"
+                        radius:"10dp"
+                        md_bg_color:'#dadada'
+                        ripple_behavior: True
+                        on_release:root.show_date_picker()
+                        id:date_selector
+                        MDAnchorLayout:
+                            anchor_x:'center'
+                            anchor_y:'center'
+                            MDIcon:
+                                icon:'calendar-edit'
+                                theme_text_color: "Custom"
+                                text_color: "#8d8d8d"
+                                id:date_selector_icon
+                MDRelativeLayout:
+                    radius:"10dp"
+                    md_bg_color:"#f2f2f2" if len(articulos_nota.children)==0 else (0,0,0,0)
+                    ScrollView:
+                        scroll_wheel_distance:dp(50)
+                        pos_hint:{'center_x':.5}
+                        size_hint_y:1
+                        MDList:
+                            id:articulos_nota
+                    MDAnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'center'
+                        md_bg_color:(0,0,0,0)
+                        MDLabel:
+                            adaptive_height:True
+                            text:"Sin artículos" if len(articulos_nota.children)==0 else ""
+                            font_name:'Regular'
+                            font_size:"15sp"
+                            halign:'center'
+                            theme_text_color: "Custom"
+                            text_color: (0,0,0,.4)
+                MDBoxLayout:
+                    orientation:'vertical'
+                    height:self.minimum_height
+                    size_hint_y:None
+                    id:desgloses
+                    MDBoxLayout:
+                        size_hint_y:None
+                        height:self.minimum_height
+                        MDLabel:
+                            text:'Subtotal:'
+                            halign:'right'
+                            adaptive_height:True
+                            font_name:'Regular'
+                        MDLabel:
+                            id:subtotal
+                            size_hint_x:.7
+                            font_name:'Regular'
+                            text:'$0.00'
+                            halign:'right'
+                    MDBoxLayout:
+                        size_hint_y:None
+                        height:self.minimum_height
+                        MDLabel:
+                            text:'Descuentos:'
+                            halign:'right'
+                            adaptive_height:True
+                            font_name:'Regular'
+                        MDLabel:
+                            id:descuento
+                            font_name:'Regular'
+                            text:'$0.00'
+                            halign:'right'
+                            size_hint_x:.7
+                    MDBoxLayout:
+                        size_hint_y:None
+                        height:self.minimum_height
+                        MDLabel:
+                            text:'Envío:'
+                            halign:'right'
+                            adaptive_height:True
+                            font_name:'Regular'
+                        MDLabel:
+                            id:envio
+                            font_name:'Regular'
+                            text:'$0.00'
+                            halign:'right'
+                            size_hint_x:.7
+                    MDBoxLayout:
+                        size_hint_y:None
+                        height:self.minimum_height
+                        MDLabel:
+                            text:'Abonos:'
+                            halign:'right'
+                            adaptive_height:True
+                            font_name:'Regular'
+                        MDLabel:
+                            id:abono
+                            size_hint_x:.7
+                            font_name:'Regular'
+                            text:'$0.00'
+                            halign:'right'
+                MDRelativeLayout:
+                    md_bg_color:"#dadada"
+                    radius:"10dp"
+                    size_hint:1,None
+                    height:"40dp"
+                    MDFloatLayout:
+                        id:selector
+                        size_hint:.30,.8
+                        pos_hint:{'center_x':1/6,'center_y':.5}
+                        md_bg_color:1,1,1,1
+                        radius:"10dp"
+                    MDBoxLayout:
+                        selected:1
+                        MDAnchorLayout:
+                            anchor_x:'center'
+                            anchor_y:'center'
+                            MDFlatButton:
+                                text:'Sin abono'
+                                on_release:
+                                    root.selector(1/6)
+                                    for i in self.parent.parent.children: i.children[0].active=False
+                                    self.active=True
+                                font_name:'Regular'
+                                id:s_abono
+                                active:True
+                        MDAnchorLayout:
+                            anchor_x:'center'
+                            anchor_y:'center'
+                            MDFlatButton:
+                                text:'Con abono'
+                                id:c_abono
+                                on_release:
+                                    root.selector(1/2)
+                                    for i in self.parent.parent.children: i.children[0].active=False
+                                    self.active=True
+                                font_name:'Regular'
+                                active:False
+                        MDAnchorLayout:
+                            anchor_x:'center'
+                            anchor_y:'center'
+                            MDFlatButton:
+                                text:'Pago total'
+                                id:pago_total
+                                on_release:
+                                    root.selector(5/6)
+                                    for i in self.parent.parent.children: i.children[0].active=False
+                                    self.active=True
+                                font_name:'Regular'
+                                active:False
+                MDCard:
+                    size_hint_x:1
+                    md_bg_color:'#089cba'
+                    size_hint_y:None
+                    height:"36dp"
+                    radius:"10dp"
+                    padding:"15dp"
+                    on_release:
+                        app.root.loading()
+                        if s_abono.active:root.venta()
+                        if c_abono.active:root.abono()
+                        if pago_total.active:root.venta(-1)
+                    MDLabel:
+                        font_name:'Bold'
+                        text:'GUARDAR'
+                        halign:'left'
+                        font_size:'15sp'
+                        theme_text_color: "Custom"
+                        text_color: (1,1,1,1)
+                    MDLabel:
+                        id:saldo
+                        font_name:'Bold'
+                        text:'$0.00'
+                        halign:'right'
+                        font_size:'15sp'
+                        theme_text_color: "Custom"
+                        text_color: (1,1,1,1)
